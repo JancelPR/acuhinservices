@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Monitor,
+  PlusCircle,
 } from "lucide-react";
 import { useScrollReveal } from "../../hooks/useScrollReveal";
 import ProductCard from "../ProductCard";
@@ -148,6 +149,11 @@ const POS: React.FC<POSProps> = ({
   const [customerPayment, setCustomerPayment] = useState("");
   const [isPaymentFocused, setIsPaymentFocused] = useState(false);
   const [isCartVisible, setIsCartVisible] = useState(false); // Mobile cart visibility (Bottom Sheet)
+
+  // Custom Item State
+  const [showCustomItemModal, setShowCustomItemModal] = useState(false);
+  const [customItemName, setCustomItemName] = useState("");
+  const [customItemPrice, setCustomItemPrice] = useState("");
 
   // Computed Values
   const filteredProducts = useMemo(() => {
@@ -332,6 +338,30 @@ const POS: React.FC<POSProps> = ({
     setIsPaymentFocused(false);
   };
 
+  const addCustomItem = () => {
+    if (!customItemName || !customItemPrice) return;
+
+    const priceNum = parseFloat(customItemPrice);
+    if (isNaN(priceNum) || priceNum < 0) return;
+
+    const customItem: CartItem = {
+      id: `custom-${Date.now()}`,
+      name: customItemName,
+      price: priceNum,
+      quantity: 1,
+      category: "Miscellaneous",
+      stock: 99999, // Effectively infinite for custom items
+      image: "https://placehold.co/100x100?text=Misc",
+    };
+
+    setCart((prev) => [...prev, customItem]);
+
+    // Reset and close
+    setCustomItemName("");
+    setCustomItemPrice("");
+    setShowCustomItemModal(false);
+  };
+
   return (
     <div className="flex flex-col h-full bg-gray-50 overflow-hidden">
       {/* Unified POS Header with Pill Categories Stacking */}
@@ -467,6 +497,7 @@ const POS: React.FC<POSProps> = ({
               <ShoppingCart size={22} className="text-[#4285F4]" /> Current
               Order
             </h3>
+
             <button
               className="md:hidden p-2 hover:bg-gray-100 rounded-full text-gray-500"
               onClick={() => setIsCartVisible(false)}
@@ -536,6 +567,21 @@ const POS: React.FC<POSProps> = ({
                 </div>
               ))
             )}
+          </div>
+
+          <div className="px-6 py-2 flex justify-start flex-shrink-0">
+            <button
+              onClick={() => setShowCustomItemModal(true)}
+              className="flex items-center gap-1.5 text-[#4285F4] hover:text-blue-600 transition-colors group"
+            >
+              <PlusCircle
+                size={16}
+                className="group-hover:scale-110 transition-transform"
+              />
+              <span className="text-[12px] font-bold text-[#4285F4]">
+                Add custom misc.
+              </span>
+            </button>
           </div>
 
           <div className="p-4 lg:p-6 bg-gray-50/50 border-t border-gray-100 flex-shrink-0">
@@ -730,6 +776,83 @@ const POS: React.FC<POSProps> = ({
                   className="flex-1 px-3 py-2 bg-[#34A853] text-white rounded-lg text-sm font-medium hover:bg-[#2d9147] transition-colors flex items-center justify-center gap-1.5 disabled:bg-gray-200 disabled:cursor-not-allowed shadow-md"
                 >
                   <CreditCard size={14} /> Confirm Checkout
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Item Modal */}
+      {showCustomItemModal && (
+        <div className="fixed inset-0 z-[500] flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-md"
+            onClick={() => setShowCustomItemModal(false)}
+          />
+          <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl relative z-[510] animate-in zoom-in duration-300 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-[#4285F4]">
+                  <PlusCircle size={28} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-lg">
+                    Custom Item
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    Add an item not in inventory
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">
+                    Item Name
+                  </label>
+                  <input
+                    type="text"
+                    value={customItemName}
+                    onChange={(e) => setCustomItemName(e.target.value)}
+                    placeholder="Enter item name..."
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2 text-sm focus:ring-4 focus:ring-blue-50 focus:bg-white outline-none transition-all placeholder:text-gray-300"
+                    autoFocus
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">
+                    Price
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">
+                      {CURRENCY}
+                    </span>
+                    <input
+                      type="number"
+                      value={customItemPrice}
+                      onChange={(e) => setCustomItemPrice(e.target.value)}
+                      placeholder="0.00"
+                      className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-4 focus:ring-blue-50 focus:bg-white outline-none transition-all placeholder:text-gray-300 font-bold"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowCustomItemModal(false)}
+                  className="flex-1 py-2 text-gray-500 font-bold text-sm hover:bg-gray-50 rounded-xl transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={addCustomItem}
+                  disabled={!customItemName || !customItemPrice}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 text-white py-2 rounded-xl font-bold text-sm shadow-lg shadow-blue-100 hover:shadow-blue-200 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 disabled:shadow-none"
+                >
+                  Add to cart
                 </button>
               </div>
             </div>
