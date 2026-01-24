@@ -329,32 +329,48 @@ const Settings: React.FC<SettingsProps> = ({
   };
 
   // Category Handlers
-  const handleAddCategory = (e: React.FormEvent) => {
+  const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCategoryName.trim()) return;
-    if (categories.includes(newCategoryName.trim())) {
+    const name = newCategoryName.trim();
+    if (!name) return;
+    if (categories.includes(name)) {
       setSettingsError("Category already exists");
       return;
     }
-    setCategories([...categories, newCategoryName.trim()]);
-    setNewCategoryName("");
-    setSettingsSuccess("Category added successfully");
-    setTimeout(() => setSettingsSuccess(""), 2000);
+    try {
+      await api.createCategory(name);
+      setCategories([...categories, name]);
+      setNewCategoryName("");
+      setSettingsSuccess("Category added successfully");
+      setTimeout(() => setSettingsSuccess(""), 2000);
+    } catch (error) {
+      setSettingsError(
+        error instanceof Error ? error.message : "Failed to add category",
+      );
+    }
   };
 
-  const handleDeleteCategory = (catToDelete: string) => {
+  const handleDeleteCategory = async (catToDelete: string) => {
     if (catToDelete === "All") return;
 
-    // Update products to 'All' category
-    setProducts(
-      products.map((p) =>
-        p.category === catToDelete ? { ...p, category: "All" } : p,
-      ),
-    );
+    try {
+      await api.deleteCategory(catToDelete);
 
-    setCategories(categories.filter((c) => c !== catToDelete));
-    setSettingsSuccess("Category deleted and products moved to 'All'");
-    setTimeout(() => setSettingsSuccess(""), 2000);
+      // Update products to 'All' category locally
+      setProducts(
+        products.map((p) =>
+          p.category === catToDelete ? { ...p, category: "Miscellaneous" } : p,
+        ),
+      );
+
+      setCategories(categories.filter((c) => c !== catToDelete));
+      setSettingsSuccess("Category deleted successfully");
+      setTimeout(() => setSettingsSuccess(""), 2000);
+    } catch (error) {
+      setSettingsError(
+        error instanceof Error ? error.message : "Failed to delete category",
+      );
+    }
   };
 
   const startEditing = (cat: string) => {
@@ -362,25 +378,50 @@ const Settings: React.FC<SettingsProps> = ({
     setEditCategoryValue(cat);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     const newVal = editCategoryValue.trim();
     if (!newVal || !editingCategory) return;
+    if (editingCategory === "All") return;
+
     if (categories.includes(newVal) && newVal !== editingCategory) {
       setSettingsError("Category name already exists");
       return;
     }
 
-    // Update products use the renamed category
-    setProducts(
-      products.map((p) =>
-        p.category === editingCategory ? { ...p, category: newVal } : p,
-      ),
-    );
+    try {
+      // Renaming is actually Delete + Create in our simple API, or we update all products.
+      // Since we don't have a renameCategory endpoint, we'll create the new one and update products.
+      await api.createCategory(newVal);
 
-    setCategories(categories.map((c) => (c === editingCategory ? newVal : c)));
-    setEditingCategory(null);
-    setSettingsSuccess("Category updated");
-    setTimeout(() => setSettingsSuccess(""), 2000);
+      // Update products use the renamed category in DB
+      const productsToUpdate = products.filter(
+        (p) => p.category === editingCategory,
+      );
+      for (const p of productsToUpdate) {
+        await api.updateProduct(p.id, { ...p, category: newVal });
+      }
+
+      // Delete the old one
+      await api.deleteCategory(editingCategory);
+
+      // Update local state
+      setProducts(
+        products.map((p) =>
+          p.category === editingCategory ? { ...p, category: newVal } : p,
+        ),
+      );
+
+      setCategories(
+        categories.map((c) => (c === editingCategory ? newVal : c)),
+      );
+      setEditingCategory(null);
+      setSettingsSuccess("Category updated");
+      setTimeout(() => setSettingsSuccess(""), 2000);
+    } catch (error) {
+      setSettingsError(
+        error instanceof Error ? error.message : "Failed to update category",
+      );
+    }
   };
 
   return (

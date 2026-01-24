@@ -14,15 +14,20 @@ export const useStoreData = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        // Fetch products and transactions from the API
-        const [fetchedProducts, fetchedTransactions] = await Promise.all([
+        // Fetch products, transactions, and categories from the API
+        const [fetchedProducts, fetchedTransactions, fetchedCategories] = await Promise.all([
           api.getProducts(),
-          api.getTransactions()
+          api.getTransactions(),
+          api.getCategories()
         ]);
         
         // Always update with data from API (even if empty array)
         setProducts(fetchedProducts);
         setTransactions(fetchedTransactions);
+        // Only set categories if we got some back, otherwise keep defaults
+        if (fetchedCategories && fetchedCategories.length > 0) {
+          setCategories(fetchedCategories);
+        }
       } catch (error) {
         console.error('Failed to fetch data from API:', error);
         // If API fails, keep using localStorage/initial data as fallback
@@ -33,17 +38,7 @@ export const useStoreData = () => {
     };
 
     fetchData();
-  }, []);
-
-  // Update categories automatically based on products
-  useEffect(() => {
-    setCategories(prev => {
-        const categoriesFromProducts = products.map(p => p.category);
-        const combined = Array.from(new Set([...prev, ...categoriesFromProducts]));
-        if (combined.length !== prev.length) return combined;
-        return prev;
-    });
-  }, [products, setCategories]);
+  }, [setCategories, setProducts, setTransactions]);
 
   return {
     products,

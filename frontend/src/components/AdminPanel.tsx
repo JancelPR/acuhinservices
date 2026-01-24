@@ -16,6 +16,7 @@ import POS from "./admin/POS";
 import OrderHistory from "./admin/OrderHistory";
 import Settings from "./admin/Settings";
 import { STORE_NAME } from "../constants";
+import { api } from "../services/api";
 
 interface AdminPanelProps {
   products: Product[];
@@ -57,9 +58,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     "prev_low_stock_count",
   );
 
-  const handleAddCategory = (newCategory: string) => {
+  const handleAddCategory = async (newCategory: string) => {
     if (!categories.includes(newCategory)) {
-      setCategories((prev) => [...prev, newCategory]);
+      try {
+        await api.createCategory(newCategory);
+        setCategories((prev) => [...prev, newCategory]);
+      } catch (error) {
+        console.error("Failed to save category to database", error);
+        // Fallback to local update if API fails (though ideally we want DB sync)
+        setCategories((prev) => [...prev, newCategory]);
+      }
     }
     setActiveCategory(newCategory);
   };

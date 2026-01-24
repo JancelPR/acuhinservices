@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import productRoutes from './routes/productRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import { connectDB, mongoose } from './config/db.js';
 
@@ -26,6 +27,7 @@ app.get('/health', (req, res) => {
 // Register API routes for products and transactions
 app.use('/api/products', productRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/auth', authRoutes);
 
 export { app, connectDB };

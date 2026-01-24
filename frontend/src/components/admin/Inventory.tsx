@@ -32,7 +32,7 @@ interface InventoryProps {
   categories: string[];
   setCategories: React.Dispatch<React.SetStateAction<string[]>>;
   activeCategory: string;
-  onAddCategory: (newCategory: string) => void;
+  onAddCategory: (newCategory: string) => Promise<void>;
 }
 
 const Inventory: React.FC<InventoryProps> = ({
@@ -685,9 +685,9 @@ const Inventory: React.FC<InventoryProps> = ({
                         />
                         <button
                           type="button"
-                          onClick={() => {
+                          onClick={async () => {
                             if (newCategoryName.trim()) {
-                              onAddCategory(newCategoryName.trim());
+                              await onAddCategory(newCategoryName.trim());
                               setCurrentProduct({
                                 ...currentProduct,
                                 category:

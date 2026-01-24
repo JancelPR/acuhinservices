@@ -66,6 +66,36 @@ export const api = {
     return await response.json();
   },
 
+  // Categories
+  async getCategories(): Promise<string[]> {
+    const response = await fetch(`${API_BASE_URL}/categories`);
+    if (!response.ok) throw new Error('Failed to fetch categories');
+    return await response.json();
+  },
+
+  async createCategory(name: string): Promise<string> {
+    const response = await fetch(`${API_BASE_URL}/categories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Failed to create category' }));
+      throw new Error(error.message || 'Failed to create category');
+    }
+    return await response.json();
+  },
+
+  async deleteCategory(name: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/categories/${name}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Failed to delete category' }));
+      throw new Error(error.message || 'Failed to delete category');
+    }
+  },
+
   // Auth
   async login(credentials: { email: string; password: string }): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
