@@ -40,7 +40,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
           ? "opacity-60 cursor-not-allowed grayscale"
           : ""
       }
-      ${isAdmin ? "hover:ring-2 hover:ring-[#4285F4] hover:ring-inset" : ""}
       `}
     >
       <div className="relative mb-2 overflow-hidden rounded-[1.2rem] md:rounded-[1.5rem] aspect-square bg-gray-50">
@@ -53,7 +52,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             onError={(e) => {
               (e.target as HTMLImageElement).src = ""; // Clear src to show placeholder if needed
               (e.target as HTMLImageElement).parentElement?.classList.add(
-                "bg-gray-100"
+                "bg-gray-100",
               );
               (e.target as HTMLImageElement).style.display = "none";
             }}
@@ -83,7 +82,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   onEdit?.(product);
                   setShowAdminMenu(false);
                 }}
-                className="p-1 text-[#4285F4] hover:scale-110 active:scale-95 transition-all duration-200"
+                className="p-1 text-orange-500 hover:scale-110 active:scale-95 transition-all duration-200"
                 title="Edit Item"
               >
                 <Edit size={14} />
@@ -126,19 +125,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 !isAvailable
                   ? "bg-[#EA4335]"
                   : isAdmin &&
-                    product.lowStockThreshold !== undefined &&
-                    product.stock <= product.lowStockThreshold
-                  ? "bg-[#F97316]"
-                  : "bg-[#34A853]"
+                      product.lowStockThreshold !== undefined &&
+                      product.stock <= product.lowStockThreshold
+                    ? "bg-[#F97316]"
+                    : "bg-[#34A853]"
               }`}
             />
             {!isAvailable
               ? "Out of Stock"
               : isAdmin &&
-                product.lowStockThreshold !== undefined &&
-                product.stock <= product.lowStockThreshold
-              ? "Low Stock"
-              : "In Stock"}
+                  product.lowStockThreshold !== undefined &&
+                  product.stock <= product.lowStockThreshold
+                ? "Low Stock"
+                : "In Stock"}
           </div>
         </div>
       </div>
@@ -159,7 +158,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
 
           {!isAdmin && isAvailable && (
-            <button className="w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-gray-50 flex items-center justify-center text-gray-600 group-hover:bg-[#4285F4] group-hover:text-white transition-all duration-300 shadow-sm">
+            <button className="w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-gray-50 flex items-center justify-center text-gray-600 group-hover:bg-gradient-to-br group-hover:from-orange-500 group-hover:to-red-500 group-hover:text-white transition-all duration-300 shadow-sm">
               <Plus className="w-4 h-4 md:w-4.5 md:h-4.5" />
             </button>
           )}

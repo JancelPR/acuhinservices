@@ -138,12 +138,18 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
               )}
 
               {lowStockProducts.length === 0 ? (
-                <div className="py-12 text-center px-6 group">
-                  <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-200 mx-auto mb-3">
-                    <PackageSearch size={24} />
+                <div className="py-16 text-center px-6 group flex flex-col items-center justify-center">
+                  <div className="relative mb-4">
+                    <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-400/60 shadow-inner group-hover:scale-110 group-hover:bg-emerald-100/50 transition-all duration-500">
+                      <Bell size={28} className="rotate-12" />
+                    </div>
+                    <div className="absolute top-0 right-0 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse shadow-sm" />
                   </div>
-                  <p className="text-[10px] text-gray-300 font-bold uppercase">
-                    Healthy Inventory
+                  <h3 className="text-xs font-black text-gray-800 uppercase tracking-widest mb-1">
+                    All Clear
+                  </h3>
+                  <p className="text-[10px] text-gray-400 font-bold italic">
+                    Inventory levels are healthy
                   </p>
                 </div>
               ) : (

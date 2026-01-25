@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Monitor,
   PlusCircle,
+  PackageSearch,
 } from "lucide-react";
 import { useScrollReveal } from "../../hooks/useScrollReveal";
 import ProductCard from "../ProductCard";
@@ -30,6 +31,7 @@ interface POSProps {
   onViewReceipt: (receipt: ReceiptData) => void;
   onMobileMenuOpen: () => void;
   onLogout: () => void;
+  isSidebarCollapsed?: boolean;
 }
 
 const POS: React.FC<POSProps> = ({
@@ -42,6 +44,7 @@ const POS: React.FC<POSProps> = ({
   onViewReceipt,
   onMobileMenuOpen,
   onLogout,
+  isSidebarCollapsed,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -365,18 +368,44 @@ const POS: React.FC<POSProps> = ({
   return (
     <div className="flex flex-col h-full bg-gray-50 overflow-hidden">
       {/* Unified POS Header with Pill Categories Stacking */}
-      <div className="bg-transparent px-4 pt-0 pb-2 flex flex-col gap-4 flex-shrink-0">
+      <div className="bg-transparent px-4 pt-0 pb-2 flex flex-col gap-2 flex-shrink-0">
         {/* Terminal Header */}
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-            <span className="bg-blue-50 p-2 rounded-xl text-[#4285F4]">
-              <Monitor size={24} />
+        <div className="flex items-center justify-between py-3 px-6 bg-white/60 backdrop-blur-xl rounded-[2rem] shadow-[0_15px_35px_-5px_rgba(249,115,22,0.12),0_5px_15px_-3px_rgba(0,0,0,0.04)] relative overflow-hidden group border-none">
+          {/* Subtle Inner Glow */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+
+          <h1 className="text-xl font-extrabold text-gray-900 flex items-center gap-4 tracking-tight relative z-10">
+            <div className="relative">
+              <span className="flex bg-orange-50 p-2.5 rounded-2xl text-orange-600 shadow-sm ring-1 ring-orange-100/50 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                <Monitor size={20} />
+              </span>
+              <div className="absolute inset-0 bg-orange-400 blur-lg opacity-20 group-hover:opacity-40 transition-opacity" />
+            </div>
+            <span className="font-black text-gray-800 tracking-tighter">
+              Terminal
             </span>
-            Terminal
           </h1>
+
+          {/* Integrated Search Bar */}
+          <div className="relative flex-1 max-w-sm ml-auto z-20 group/search">
+            <Search
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-orange-400/70 group-focus-within/search:text-orange-500 transition-colors"
+              size={16}
+            />
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-1.5 bg-orange-50/30 border border-orange-100/50 rounded-full text-sm text-gray-700 placeholder:text-gray-400/80 outline-none focus:ring-4 focus:ring-orange-500/5 focus:bg-white focus:border-orange-200 transition-all duration-300 shadow-inner"
+            />
+          </div>
+
+          {/* Liquid highlight effect */}
+          <div className="absolute -left-1/4 top-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-150%] group-hover:translate-x-[350%] transition-transform duration-[1500ms]" />
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           {/* Scrollable Category Pills with Arrows */}
           <div className="relative flex items-center group/nav">
             {canScrollLeft && (
@@ -408,8 +437,8 @@ const POS: React.FC<POSProps> = ({
                     onClick={() => onCategoryChange(cat)}
                     className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 active:scale-95 whitespace-nowrap ${
                       activeCategory === cat
-                        ? "bg-[#0f172a] text-white shadow-lg shadow-slate-200"
-                        : "bg-white text-slate-600 border border-gray-100 hover:bg-gray-50 shadow-sm"
+                        ? "bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg shadow-orange-200"
+                        : "bg-white text-slate-600 border border-gray-100 hover:bg-orange-50/50 shadow-sm"
                     }`}
                   >
                     {cat}
@@ -428,37 +457,54 @@ const POS: React.FC<POSProps> = ({
               </button>
             )}
           </div>
-
-          {/* Search Input Stacked Below */}
-          <div className="relative w-full md:max-w-[224px] lg:max-w-md">
-            <Search
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-              size={18}
-            />
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-2.5 rounded-full border border-gray-100 bg-white focus:ring-4 focus:ring-blue-50 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none shadow-sm"
-            />
-          </div>
         </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden relative">
         {/* POS Product Grid */}
         <div className="flex-1 overflow-y-auto px-4 lg:px-4 pb-24 lg:pb-6 no-scrollbar">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-3">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                isAdmin={false}
-                onAddToCart={addToCart}
-              />
-            ))}
-          </div>
+          {filteredProducts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 px-4 w-full h-[60vh]">
+              <div className="relative mb-8">
+                <div className="w-24 h-24 bg-orange-50/50 rounded-[2rem] flex items-center justify-center text-orange-200 shadow-inner rotate-3">
+                  <PackageSearch size={48} className="-rotate-3" />
+                </div>
+                <div className="absolute inset-0 bg-orange-500/5 rounded-[2rem] animate-pulse" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-800 mb-2 tracking-tight">
+                No Results Found
+              </h3>
+              <p className="text-slate-400 text-sm font-medium text-center max-w-[280px]">
+                We couldn't find any products in{" "}
+                <span className="text-orange-500 font-bold">
+                  {activeCategory}
+                </span>{" "}
+                matching your search.
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  onCategoryChange("All");
+                }}
+                className="mt-8 px-8 py-3 bg-white border-2 border-orange-50 text-orange-500 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-orange-50 hover:border-orange-100 transition-all active:scale-95 shadow-sm"
+              >
+                Reset Exploration
+              </button>
+            </div>
+          ) : (
+            <div
+              className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 ${isSidebarCollapsed ? "xl:grid-cols-5" : "xl:grid-cols-4"} 2xl:grid-cols-5 gap-3 md:gap-3`}
+            >
+              {filteredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  isAdmin={false}
+                  onAddToCart={addToCart}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Mobile Bottom Sheet Overlay (Dimmer) */}
@@ -494,7 +540,7 @@ const POS: React.FC<POSProps> = ({
 
           <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between flex-shrink-0">
             <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
-              <ShoppingCart size={22} className="text-[#4285F4]" /> Current
+              <ShoppingCart size={22} className="text-orange-500" /> Current
               Order
             </h3>
 
@@ -531,7 +577,7 @@ const POS: React.FC<POSProps> = ({
                     <p className="text-[13px] lg:text-base font-medium text-gray-800 truncate leading-tight">
                       {item.name}
                     </p>
-                    <p className="text-[11px] lg:text-sm font-medium text-blue-600">
+                    <p className="text-[11px] lg:text-sm font-medium text-orange-600">
                       {CURRENCY}
                       {item.price.toFixed(2)}
                     </p>
@@ -572,13 +618,13 @@ const POS: React.FC<POSProps> = ({
           <div className="px-6 py-2 flex justify-start flex-shrink-0">
             <button
               onClick={() => setShowCustomItemModal(true)}
-              className="flex items-center gap-1.5 text-[#4285F4] hover:text-blue-600 transition-colors group"
+              className="flex items-center gap-1.5 text-orange-500 hover:text-orange-600 transition-colors group"
             >
               <PlusCircle
                 size={16}
                 className="group-hover:scale-110 transition-transform"
               />
-              <span className="text-[12px] font-bold text-[#4285F4]">
+              <span className="text-[12px] font-bold text-orange-600">
                 Add custom misc.
               </span>
             </button>
@@ -597,7 +643,7 @@ const POS: React.FC<POSProps> = ({
             <button
               onClick={handleCheckout}
               disabled={cart.length === 0}
-              className="w-full bg-gradient-to-r from-[#10B981] to-[#059669] text-white py-3 lg:py-3.5 rounded-xl lg:rounded-2xl font-bold text-sm flex items-center justify-center gap-2 lg:gap-3 hover:from-[#059669] hover:to-[#047857] disabled:from-gray-300 disabled:to-gray-200 disabled:cursor-not-allowed transition-all shadow-lg shadow-emerald-200/50 hover:shadow-emerald-200 active:scale-[0.98]"
+              className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-3 lg:py-3.5 rounded-xl lg:rounded-2xl font-bold text-sm flex items-center justify-center gap-2 lg:gap-3 hover:from-orange-600 hover:to-red-700 disabled:from-gray-300 disabled:to-gray-200 disabled:cursor-not-allowed transition-all shadow-lg shadow-orange-200/50 hover:shadow-orange-200 active:scale-[0.98]"
             >
               <CreditCard size={18} className="lg:w-5 lg:h-5" />
               <span>Confirm & Checkout</span>
@@ -613,7 +659,7 @@ const POS: React.FC<POSProps> = ({
               className="w-full bg-gray-900 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between animate-in slide-in-from-bottom-10 fade-in duration-300"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-xs ring-4 ring-blue-500/20">
+                <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center text-orange-600 font-bold text-xs ring-4 ring-orange-500/10">
                   {cart.length}
                 </div>
                 <span className="font-medium">Review Order</span>
@@ -721,7 +767,7 @@ const POS: React.FC<POSProps> = ({
                       placeholder="0.00"
                       min="0"
                       step="0.01"
-                      className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#4285F4] bg-gray-50 text-gray-900 text-sm"
+                      className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50 text-gray-900 text-sm"
                     />
                   </div>
                 </div>

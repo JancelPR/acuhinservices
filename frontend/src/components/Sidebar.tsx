@@ -221,7 +221,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       onMouseLeave={onMouseLeave}
       className={`${
         isCollapsed ? "w-20 p-4" : "w-48 lg:w-64 p-4 lg:p-6"
-      } bg-white h-screen fixed left-0 top-0 border-r border-gray-100 flex flex-col hidden md:flex z-[100] transition-all duration-[2000ms] shadow-sm ${
+      } bg-white/80 backdrop-blur-xl h-screen fixed left-0 top-0 border-r border-gray-100/50 flex flex-col hidden md:flex z-[100] transition-all duration-[2000ms] shadow-[10px_0_30px_-15px_rgba(0,0,0,0.05)] ${
         isClosingSoon
           ? "opacity-75 scale-[0.99] grayscale-[0.2]"
           : "opacity-100 scale-100"
@@ -237,17 +237,23 @@ const Sidebar: React.FC<SidebarProps> = ({
             isCollapsed ? "justify-center w-full" : ""
           }`}
         >
-          <div className="w-8 h-8 lg:w-11 lg:h-11 bg-[#4285F4] rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-100 flex-shrink-0 transition-all duration-300">
-            <Store className="w-4 h-4 lg:w-6 lg:h-6" />
+          {/* Main Store Icon - Lightened with translucent background */}
+          <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-50/50 rounded-2xl flex items-center justify-center text-orange-600 shadow-sm shadow-orange-100/20 flex-shrink-0 transition-all duration-500 ring-1 ring-orange-100/20">
+            <Store className="w-6 h-6 lg:w-8 lg:h-8" />
           </div>
           {!isCollapsed && (
             <div className="overflow-hidden whitespace-nowrap min-w-0 flex-1">
-              <h1 className="font-bold text-gray-900 leading-tight tracking-tight text-xs lg:text-base mb-0.5">
+              <h1 className="font-extrabold text-gray-900 leading-none tracking-tight text-sm lg:text-[17px] mb-1">
                 {STORE_NAME}
               </h1>
-              <p className="text-[8px] lg:text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
-                {isAdmin ? "Admin" : "Guest"}
-              </p>
+              <div className="flex items-center gap-1.5">
+                <div
+                  className={`h-1.5 w-1.5 rounded-full ${isAdmin ? "bg-orange-500" : "bg-emerald-500"}`}
+                />
+                <p className="text-[9px] lg:text-[10px] text-gray-400 font-black uppercase tracking-[0.15em] leading-none">
+                  {isAdmin ? "Admin Portal" : "Guest Mode"}
+                </p>
+              </div>
             </div>
           )}
         </div>
@@ -256,7 +262,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {isAdmin && (
           <div className="relative">
             <button
-              className={`text-gray-400 hover:text-[#4285F4] transition-all flex-shrink-0 relative ${
+              className={`text-gray-400 hover:text-orange-500 transition-all flex-shrink-0 relative ${
                 !isCollapsed ? "mr-2 lg:mr-6" : ""
               }`}
               title={`${notificationCount} Notifications`}
@@ -296,7 +302,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             // Admin Services List
             <div className="mb-8">
               {[
-                { id: "pos", label: "POS", icon: Monitor },
+                { id: "pos", label: "Terminal", icon: Monitor },
                 { id: "inventory", label: "Inventory", icon: Package },
                 { id: "history", label: "Logs", icon: ClipboardList },
                 { id: "analytics", label: "Analytics", icon: BarChart3 },
@@ -304,20 +310,23 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={service.id}
                   onClick={() => onViewChange?.(service.id as any)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-full transition-all text-left relative group
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left relative group
                     ${
                       currentView === service.id
-                        ? "bg-[#E8F0FE] text-[#1967D2]"
-                        : "text-gray-600 hover:bg-gray-50"
+                        ? "bg-orange-50 text-orange-700 shadow-sm shadow-orange-100"
+                        : "text-gray-500 hover:bg-gray-50/50 hover:text-gray-900"
                     }
                     ${isCollapsed ? "justify-center px-0" : ""}`}
                   title={isCollapsed ? service.label : ""}
                 >
+                  {currentView === service.id && (
+                    <div className="absolute left-0 w-1 h-5 bg-orange-500 rounded-full" />
+                  )}
                   <span
                     className={`${
                       currentView === service.id
-                        ? "text-[#1967D2]"
-                        : "text-gray-500"
+                        ? "text-orange-500"
+                        : "text-gray-400 group-hover:text-gray-600"
                     }`}
                   >
                     <service.icon className="w-5 h-5 lg:w-6 lg:h-6" />
@@ -390,23 +399,32 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      <div className="mt-auto pt-6 space-y-4 flex-shrink-0 border-t border-gray-50">
+      <div className="mt-auto pt-6 space-y-2 flex-shrink-0 border-t border-gray-100/50">
         {isAdmin && (
           <>
             <button
               onClick={() => onViewChange?.("settings")}
-              className={`w-full flex items-center gap-3 px-4 py-3 lg:px-3 lg:py-2.5 rounded-full transition-all text-left relative group
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left relative group
                 ${
                   currentView === "settings"
-                    ? "bg-[#E8F0FE] text-[#1967D2]"
-                    : "text-gray-500 hover:text-[#4285F4] hover:bg-gray-50"
+                    ? "bg-orange-50 text-orange-700 shadow-sm shadow-orange-100"
+                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-50/50"
                 }
                 ${isCollapsed ? "justify-center px-0" : ""}`}
               title={isCollapsed ? "Settings" : ""}
             >
-              <SettingsIcon className="w-5 h-5 lg:w-6 lg:h-6" />
+              {currentView === "settings" && (
+                <div className="absolute left-0 w-1 h-5 bg-orange-500 rounded-full" />
+              )}
+              <SettingsIcon
+                className={`w-5 h-5 lg:w-6 lg:h-6 ${currentView === "settings" ? "text-orange-500" : "text-gray-400 group-hover:text-gray-600"}`}
+              />
               {!isCollapsed && (
-                <span className="text-sm font-medium">Settings</span>
+                <span
+                  className={`text-sm tracking-tight ${currentView === "settings" ? "font-bold" : "font-medium"}`}
+                >
+                  Settings
+                </span>
               )}
               {isCollapsed && (
                 <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50">
@@ -417,40 +435,52 @@ const Sidebar: React.FC<SidebarProps> = ({
 
             <button
               onClick={onLogout}
-              className={`w-full flex items-center gap-3 px-4 py-3 lg:px-3 lg:py-2.5 text-[#EA4335] hover:bg-red-50 rounded-full transition-all text-sm font-medium ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 text-rose-500 hover:bg-rose-50 rounded-xl transition-all text-sm font-bold group ${
                 isCollapsed ? "justify-center px-0" : ""
               }`}
               title={isCollapsed ? "Logout" : ""}
             >
-              <LogOut className="w-5 h-5 lg:w-6 lg:h-6" />{" "}
-              {!isCollapsed && "Sign Out"}
+              <LogOut className="w-5 h-5 lg:w-6 lg:h-6 group-hover:-translate-x-0.5 transition-transform" />{" "}
+              {!isCollapsed && <span>Sign Out</span>}
             </button>
           </>
         )}
 
         {!isAdmin && (
           <div
-            className={`bg-blue-50/50 rounded-3xl border border-blue-100 ${
+            className={`bg-orange-50/30 backdrop-blur-sm rounded-2xl border border-orange-100/50 ${
               isCollapsed ? "p-2" : "p-4"
-            }`}
+            } shadow-inner bg-gradient-to-br from-orange-50/50 to-transparent`}
           >
             {!isCollapsed ? (
               <>
                 <div className="flex items-center gap-2 text-gray-800 font-bold mb-2">
-                  <Clock size={16} className="text-[#34A853]" />
-                  <h3 className="text-sm font-medium">Store Hours</h3>
+                  <div className="p-1.5 bg-white rounded-lg shadow-sm">
+                    <Clock size={14} className="text-[#34A853]" />
+                  </div>
+                  <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    Store Hours
+                  </h3>
                 </div>
                 <div className="flex flex-col gap-0.5">
-                  <p className="text-xs font-bold text-[#1967D2]">Open Now</p>
-                  <p className="text-[11px] text-gray-500 font-medium">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <p className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">
+                      Open Now
+                    </p>
+                  </div>
+                  <p className="text-[10px] text-gray-400 font-bold ml-3.5">
                     6:00 AM - 9:00 PM
                   </p>
                 </div>
               </>
             ) : (
-              <div className="flex justify-center flex-col items-center gap-1">
-                <Clock size={18} className="text-[#34A853]" />
-                <span className="text-[10px] font-bold text-[#34A853]">
+              <div className="flex justify-center flex-col items-center gap-1.5">
+                <div className="relative">
+                  <Clock size={18} className="text-[#34A853]" />
+                  <div className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500 border-2 border-white animate-pulse" />
+                </div>
+                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-tighter">
                   Open
                 </span>
               </div>
@@ -463,7 +493,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       {onToggleCollapse && (
         <button
           onClick={onToggleCollapse}
-          className="absolute top-8 right-0 translate-x-1/2 bg-white border border-gray-100 text-gray-400 hover:text-[#4285F4] rounded-full p-1.5 shadow-md shadow-gray-200/50 transition-all z-[110] hover:scale-110"
+          className="absolute top-8 right-0 translate-x-1/2 bg-white border border-gray-100 text-gray-400 hover:text-orange-500 rounded-full p-1.5 shadow-md shadow-gray-200/50 transition-all z-[110] hover:scale-110"
         >
           {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
         </button>

@@ -133,7 +133,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex transition-all duration-300">
+    <div className="min-h-screen bg-[#F8FAFC] flex transition-all duration-300 selection:bg-blue-100 selection:text-blue-900">
+      {/* Decorative background element for premium feel */}
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_right,_#4285F405,_transparent_40%)] pointer-events-none" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_bottom_left,_#10b98105,_transparent_40%)] pointer-events-none" />
       {/* Sidebar Navigation */}
       <Sidebar
         activeCategory={activeCategory}
@@ -221,7 +224,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       <main
         className={`flex-1 transition-all duration-[2000ms] ${
           isSidebarCollapsed ? "md:ml-20" : "md:ml-48 lg:ml-64"
-        } px-2 md:px-4 pt-4 md:pt-6 pb-0 overflow-hidden h-screen flex flex-col relative`}
+        } px-2 md:px-4 pt-2 md:pt-3 pb-0 overflow-hidden h-screen flex flex-col relative`}
       >
         <div className="flex-1 overflow-hidden flex flex-col">
           <Routes>
@@ -236,6 +239,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   setCategories={setCategories}
                   activeCategory={activeCategory}
                   onAddCategory={handleAddCategory}
+                  isSidebarCollapsed={isSidebarCollapsed}
                 />
               }
             />
@@ -252,6 +256,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   onViewReceipt={setReceipt}
                   onMobileMenuOpen={() => setIsMobileMenuOpen(true)}
                   onLogout={onLogout}
+                  isSidebarCollapsed={isSidebarCollapsed}
                 />
               }
             />

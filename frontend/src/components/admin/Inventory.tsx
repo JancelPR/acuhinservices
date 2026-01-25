@@ -33,6 +33,7 @@ interface InventoryProps {
   setCategories: React.Dispatch<React.SetStateAction<string[]>>;
   activeCategory: string;
   onAddCategory: (newCategory: string) => Promise<void>;
+  isSidebarCollapsed?: boolean;
 }
 
 const Inventory: React.FC<InventoryProps> = ({
@@ -42,6 +43,7 @@ const Inventory: React.FC<InventoryProps> = ({
   setCategories,
   activeCategory,
   onAddCategory,
+  isSidebarCollapsed,
 }) => {
   const DEFAULT_UNITS = ["pc", "pack", "sachet", "rim", "sack", "stick", "kg"];
 
@@ -441,91 +443,106 @@ const Inventory: React.FC<InventoryProps> = ({
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
       {/* Sticky Header Section */}
-      <div className="flex-shrink-0 mb-6">
-        <div className="mb-3">
-          {/* Top Row: Title and Add Button */}
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-              <span className="bg-blue-50 p-2 rounded-xl text-[#4285F4]">
-                <Package size={24} />
-              </span>
-              Inventory
-            </h1>
+      {/* Terminal Style Header for Inventory */}
+      <div className="bg-transparent px-4 pt-0 pb-2 flex flex-col gap-2 flex-shrink-0">
+        <div className="flex items-center justify-between py-3 px-6 bg-white/60 backdrop-blur-xl rounded-[2rem] shadow-[0_15px_35px_-5px_rgba(249,115,22,0.12),0_5px_15px_-3px_rgba(0,0,0,0.04)] relative overflow-hidden group border-none">
+          {/* Subtle Inner Glow */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
-            <button
-              onClick={handleAddProduct}
-              className="bg-[#4285F4] text-white px-4 py-2 md:px-3 md:py-1.5 lg:px-5 lg:py-2.5 rounded-full flex items-center gap-2 hover:bg-[#1a73e8] transition-all text-xs md:text-[11px] lg:text-sm font-medium shadow-lg shadow-blue-100"
-            >
-              <Plus size={16} />{" "}
-              <span className="hidden sm:inline">Add Product</span>
-            </button>
+          <h1 className="text-xl font-extrabold text-gray-900 flex items-center gap-4 tracking-tight relative z-10">
+            <div className="relative">
+              <span className="flex bg-orange-50 p-2.5 rounded-2xl text-orange-600 shadow-sm ring-1 ring-orange-100/50 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                <Package size={20} />
+              </span>
+              <div className="absolute inset-0 bg-orange-400 blur-lg opacity-20 group-hover:opacity-40 transition-opacity" />
+            </div>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-600">
+              Inventory
+            </span>
+          </h1>
+
+          {/* Integrated Search Bar */}
+          <div className="relative flex-1 max-w-sm ml-auto z-20 group/search">
+            <Search
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-orange-400/70 group-focus-within/search:text-orange-500 transition-colors"
+              size={16}
+            />
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-1.5 bg-orange-50/10 border border-orange-100/30 rounded-full text-sm text-gray-700 placeholder:text-gray-400/80 outline-none focus:ring-4 focus:ring-orange-500/5 focus:bg-white focus:border-orange-200 transition-all duration-300 shadow-inner"
+            />
           </div>
 
-          {/* Bottom Row: Search and Filters */}
-          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between bg-white p-2 rounded-xl border border-gray-100 shadow-sm">
-            <div className="relative w-full md:w-32 lg:w-48 xl:w-64 transition-all duration-300">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                size={16}
-              />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-3 py-2 text-sm rounded-lg border border-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4285F4]/20 bg-gray-50 text-gray-900 transition-all focus:bg-white"
-              />
-            </div>
+          {/* Liquid highlight effect */}
+          <div className="absolute -right-24 -top-24 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl group-hover:bg-orange-500/10 transition-colors duration-700" />
+        </div>
 
-            <div className="flex flex-wrap gap-2 items-center w-full md:w-auto">
-              <button
-                onClick={() => setStockFilter("all")}
-                className={`flex-1 md:flex-none px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  stockFilter === "all"
-                    ? "bg-blue-500 text-white ring-1 ring-blue-300 shadow-sm"
-                    : "bg-gray-50 text-gray-600 hover:bg-gray-100 ring-1 ring-gray-200"
-                }`}
-              >
-                Total: {stats.total}
-              </button>
-              <button
-                onClick={() => setStockFilter("inStock")}
-                className={`flex-1 md:flex-none px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  stockFilter === "inStock"
-                    ? "bg-green-500 text-white ring-1 ring-green-300 shadow-sm"
-                    : "bg-green-50 text-green-700 hover:bg-green-100 ring-1 ring-green-200/50"
-                }`}
-              >
-                In Stock: {stats.available}
-              </button>
-              <button
-                onClick={() => setStockFilter("outOfStock")}
-                className={`flex-1 md:flex-none px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  stockFilter === "outOfStock"
-                    ? "bg-red-500 text-white ring-1 ring-red-300 shadow-sm"
-                    : "bg-red-50 text-red-700 hover:bg-red-100 ring-1 ring-red-200/50"
-                }`}
-              >
-                Out of Stock: {stats.outOfStock}
-              </button>
-            </div>
+        {/* Action Row: Add Button and Filters */}
+        <div className="flex flex-col md:flex-row gap-3 items-start md:items-center justify-between px-2 py-1">
+          <button
+            onClick={handleAddProduct}
+            className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:from-orange-600 hover:to-red-700 transition-all text-sm font-bold shadow-lg shadow-orange-200/50 active:scale-95 whitespace-nowrap"
+          >
+            <Plus size={18} />
+            <span>New Product</span>
+          </button>
+
+          <div className="flex flex-wrap gap-2 items-center w-full md:w-auto">
+            <button
+              onClick={() => setStockFilter("all")}
+              className={`flex-1 md:flex-none px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
+                stockFilter === "all"
+                  ? "bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg shadow-orange-200"
+                  : "bg-white text-gray-500 hover:bg-orange-50/50 border border-gray-100 shadow-sm"
+              }`}
+            >
+              All: {stats.total}
+            </button>
+            <button
+              onClick={() => setStockFilter("inStock")}
+              className={`flex-1 md:flex-none px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
+                stockFilter === "inStock"
+                  ? "bg-emerald-500 text-white shadow-md shadow-emerald-200"
+                  : "bg-white text-emerald-600 hover:bg-emerald-50 border border-emerald-100 shadow-sm"
+              }`}
+            >
+              In Stock: {stats.available}
+            </button>
+            <button
+              onClick={() => setStockFilter("outOfStock")}
+              className={`flex-1 md:flex-none px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
+                stockFilter === "outOfStock"
+                  ? "bg-rose-500 text-white shadow-md shadow-rose-200"
+                  : "bg-white text-rose-600 hover:bg-rose-50 border border-rose-100 shadow-sm"
+              }`}
+            >
+              Out of Stock: {stats.outOfStock}
+            </button>
           </div>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto no-scrollbar pb-20">
         {filteredProducts.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-gray-100">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search size={32} className="text-gray-400" />
+          <div className="text-center py-24 bg-white/50 backdrop-blur-sm rounded-3xl border border-white shadow-sm">
+            <div className="w-24 h-24 bg-orange-50/50 rounded-full flex items-center justify-center mx-auto mb-6 relative ring-1 ring-orange-100/20">
+              <div className="absolute inset-0 bg-orange-200/20 rounded-full animate-ping duration-[3000ms]" />
+              <Search size={40} className="text-orange-300 relative z-10" />
             </div>
-            <h3 className="text-xl font-bold text-gray-800">
-              No products found
+            <h3 className="text-2xl font-black text-gray-800 mb-2 tracking-tight">
+              No Items Found
             </h3>
-            <p className="text-gray-500">Add a new product to get started.</p>
+            <p className="text-gray-400 text-sm font-medium">
+              Add a new product or adjust filters to get started.
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
+          <div
+            className={`grid grid-cols-2 md:grid-cols-4 ${isSidebarCollapsed ? "lg:grid-cols-5 xl:grid-cols-6" : "lg:grid-cols-4 xl:grid-cols-5"} gap-3 lg:gap-4`}
+          >
             {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
@@ -549,7 +566,7 @@ const Inventory: React.FC<InventoryProps> = ({
                 <div
                   className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                     isEditing
-                      ? "bg-blue-50 text-[#4285F4]"
+                      ? "bg-orange-50 text-orange-600"
                       : "bg-emerald-50 text-emerald-600"
                   }`}
                 >
@@ -596,14 +613,14 @@ const Inventory: React.FC<InventoryProps> = ({
                     <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-2xl">
                       <Loader
                         size={20}
-                        className="animate-spin text-[#4285F4]"
+                        className="animate-spin text-orange-500"
                       />
                     </div>
                   )}
                 </div>
 
                 <div className="flex-1 space-y-2">
-                  <label className="cursor-pointer flex items-center gap-2 w-full px-3 py-2 border border-gray-100 rounded-xl text-[11px] font-bold text-gray-600 bg-gray-50/50 hover:bg-white hover:border-blue-200 hover:text-blue-600 transition-all shadow-sm">
+                  <label className="cursor-pointer flex items-center gap-2 w-full px-3 py-2 border border-gray-100 rounded-xl text-[11px] font-bold text-gray-600 bg-gray-50/50 hover:bg-white hover:border-orange-200 hover:text-orange-600 transition-all shadow-sm">
                     <Upload size={14} />
                     <span>Upload Photo</span>
                     <input
@@ -617,10 +634,10 @@ const Inventory: React.FC<InventoryProps> = ({
                   <button
                     onClick={handleGenerateImage}
                     disabled={isGeneratingImage || !currentProduct.name}
-                    className="w-full px-3 py-2 border border-blue-100 rounded-xl text-[11px] font-bold text-[#4285F4] bg-blue-50/30 hover:bg-white hover:border-blue-300 transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+                    className="w-full px-3 py-2 border border-orange-100 rounded-xl text-[11px] font-bold text-orange-600 bg-orange-50/30 hover:bg-white hover:border-orange-300 transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
                   >
                     <Wand2 size={14} />
-                    <span>AI Generate</span>
+                    <span>AI Generate Product Image</span>
                   </button>
                 </div>
               </div>
@@ -640,7 +657,7 @@ const Inventory: React.FC<InventoryProps> = ({
                         name: e.target.value,
                       })
                     }
-                    className="w-full bg-gray-50 border-0 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[#4285F4]/20 focus:bg-white border-transparent focus:border-blue-200 outline-none text-gray-900 text-sm transition-all border border-gray-100"
+                    className="w-full bg-gray-50 border-0 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-sm transition-all border border-gray-100"
                     placeholder="e.g. SkyFlakes"
                   />
                 </div>
@@ -650,7 +667,7 @@ const Inventory: React.FC<InventoryProps> = ({
                     Barcode
                   </label>
                   <div className="relative group">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#4285F4] transition-colors">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors">
                       <Barcode size={16} />
                     </div>
                     <input
@@ -662,7 +679,7 @@ const Inventory: React.FC<InventoryProps> = ({
                           barcode: e.target.value,
                         })
                       }
-                      className="w-full bg-gray-50 border-0 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-[#4285F4]/20 focus:bg-white border-transparent focus:border-blue-200 outline-none text-gray-900 text-sm transition-all border border-gray-100"
+                      className="w-full bg-gray-50 border-0 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-sm transition-all border border-gray-100"
                       placeholder="Scan or enter barcode"
                     />
                   </div>
@@ -697,7 +714,7 @@ const Inventory: React.FC<InventoryProps> = ({
                               setNewCategoryName("");
                             }
                           }}
-                          className="p-2 bg-[#4285F4] text-white rounded-xl hover:bg-[#1a73e8] transition-colors"
+                          className="p-2 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors"
                         >
                           <Check size={16} />
                         </button>
@@ -751,7 +768,7 @@ const Inventory: React.FC<InventoryProps> = ({
                           setCurrentProduct({ ...currentProduct, stock: 0 });
                         }
                       }}
-                      className="w-full bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#4285F4]/20 text-gray-900 transition-all focus:bg-white"
+                      className="w-full bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-500/20 text-gray-900 transition-all focus:bg-white"
                     />
                   </div>
                 </div>
@@ -784,7 +801,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             setCurrentProduct({ ...currentProduct, price: 0 });
                           }
                         }}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-6 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#4285F4]/20 text-gray-900 font-bold transition-all focus:bg-white"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-6 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-500/20 text-gray-900 font-bold transition-all focus:bg-white"
                       />
                     </div>
                   </div>
@@ -816,7 +833,7 @@ const Inventory: React.FC<InventoryProps> = ({
                                 unit: "pc",
                               });
                             }}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-blue-500 font-bold hover:underline"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-orange-600 font-bold hover:underline"
                           >
                             Reset
                           </button>
@@ -900,7 +917,7 @@ const Inventory: React.FC<InventoryProps> = ({
                       <button
                         onClick={handleGenerateDescription}
                         disabled={isGeneratingAI || !currentProduct.name}
-                        className="text-[10px] font-bold text-[#4285F4] hover:text-[#1a73e8] flex items-center gap-1 disabled:opacity-40 transition-colors"
+                        className="text-[10px] font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1 disabled:opacity-40 transition-colors"
                       >
                         <Wand2 size={10} />
                         {isGeneratingAI ? "Writing..." : "AI Write"}
@@ -916,7 +933,7 @@ const Inventory: React.FC<InventoryProps> = ({
                           description: e.target.value,
                         })
                       }
-                      className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 h-20 text-sm outline-none resize-none focus:ring-2 focus:ring-purple-500/20 text-gray-600 leading-relaxed"
+                      className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 h-20 text-sm outline-none resize-none focus:ring-2 focus:ring-orange-500/20 text-gray-600 leading-relaxed"
                       placeholder="Product highlights..."
                     ></textarea>
                   </div>
@@ -949,10 +966,10 @@ const Inventory: React.FC<InventoryProps> = ({
               </div>
               <button
                 onClick={handleSaveProduct}
-                className={`sm:w-auto px-8 py-2.5 text-sm font-bold text-white rounded-xl shadow-[0_8px_20px_-4px_rgba(147,51,234,0.3)] transition-all active:scale-95 flex items-center justify-center gap-2 ${
+                className={`sm:w-auto px-8 py-2.5 text-sm font-bold text-white rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${
                   isEditing
-                    ? "bg-purple-600 hover:bg-purple-700"
-                    : "bg-emerald-600 hover:bg-emerald-700 shadow-[0_8px_20px_-4px_rgba(16,185,129,0.3)]"
+                    ? "bg-gradient-to-r from-orange-500 to-red-600 shadow-orange-200"
+                    : "bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-emerald-200"
                 }`}
               >
                 <Save size={18} />

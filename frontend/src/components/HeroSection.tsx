@@ -17,15 +17,15 @@ interface HeroSectionProps {
 
 export default function HeroSection({ onLoginClick }: HeroSectionProps) {
   return (
-    <section className="bg-gradient-to-br from-sky-100/40 via-white to-indigo-100/40 min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-4rem)] lg:min-h-[calc(100vh-5rem)] md:pt-4 md:pb-12 overflow-hidden relative">
+    <section className="bg-gradient-to-br from-orange-50/40 via-white to-red-50/40 min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-4rem)] lg:min-h-[calc(100vh-5rem)] md:pt-4 md:pb-12 overflow-hidden relative">
       {/* Background Decorative Bloom */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-100/30 rounded-full blur-[120px] -z-10"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-100/30 rounded-full blur-[120px] -z-10"></div>
 
       <div className="mx-auto max-w-7xl px-6 w-full pt-1 pb-2">
         <div className="grid items-center gap-12 md:grid-cols-2 lg:gap-20">
           {/* LEFT CONTENT */}
           <div className="animate-in slide-in-from-left-8 duration-1000 flex flex-col items-start relative z-10 md:pt-0">
-            <span className="inline-block rounded-full bg-blue-100 px-4 py-1 text-xs font-semibold text-blue-700 mb-6 uppercase tracking-wider">
+            <span className="inline-block rounded-full bg-orange-100 px-4 py-1 text-xs font-semibold text-orange-700 mb-6 uppercase tracking-wider">
               Open Daily • Mon–Sun • 7AM–9PM
             </span>
 
@@ -51,7 +51,7 @@ export default function HeroSection({ onLoginClick }: HeroSectionProps) {
               </Link>
               <Link
                 to="/#features"
-                className="rounded-xl border-2 border-blue-600 bg-white px-7 py-3 md:px-5 md:py-2.5 md:text-base lg:px-7 lg:py-3 lg:text-base font-bold text-blue-600 hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2"
+                className="rounded-xl border-2 border-orange-600 bg-white px-7 py-3 md:px-5 md:py-2.5 md:text-base lg:px-7 lg:py-3 lg:text-base font-bold text-orange-600 hover:bg-orange-50 transition-all active:scale-95 flex items-center gap-2"
               >
                 Navigate our store
                 <Navigation className="w-4 h-4 md:w-4 md:h-4 lg:w-4 lg:h-4" />
@@ -64,7 +64,7 @@ export default function HeroSection({ onLoginClick }: HeroSectionProps) {
                 {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
-                    className={`w-10 h-10 md:w-9 md:h-9 rounded-full border-2 border-white bg-blue-${
+                    className={`w-10 h-10 md:w-9 md:h-9 rounded-full border-2 border-white bg-orange-${
                       i * 100 + 100
                     } flex items-center justify-center text-[10px] md:text-[9px] font-bold text-white`}
                   >
@@ -99,7 +99,7 @@ export default function HeroSection({ onLoginClick }: HeroSectionProps) {
 
               {/* Floating Badge 1 - Top Left */}
               <div className="absolute -top-4 -left-4 md:top-4 md:-left-8 lg:top-8 lg:-left-12 z-20 bg-white p-3 md:p-2 lg:p-4 rounded-3xl shadow-2xl flex items-center gap-3 md:gap-2 lg:gap-4 animate-float">
-                <div className="w-10 h-10 md:w-7 md:h-7 lg:w-12 lg:h-12 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600">
+                <div className="w-10 h-10 md:w-7 md:h-7 lg:w-12 lg:h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 ring-1 ring-orange-100/50">
                   <Sparkles className="w-7 h-7 md:w-4 md:h-4 lg:w-7 lg:h-7" />
                 </div>
                 <div>
@@ -114,7 +114,7 @@ export default function HeroSection({ onLoginClick }: HeroSectionProps) {
 
               {/* Floating Badge 2 - Bottom Right */}
               <div className="absolute -bottom-20 right-4 md:-bottom-8 md:right-2 lg:-bottom-12 lg:right-4 z-20 bg-white p-3 md:p-2 lg:p-4 rounded-3xl shadow-2xl flex items-center gap-3 md:gap-2 lg:gap-4 animate-float [animation-delay:1s]">
-                <div className="w-10 h-10 md:w-7 md:h-7 lg:w-12 lg:h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600">
+                <div className="w-10 h-10 md:w-7 md:h-7 lg:w-12 lg:h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 ring-1 ring-orange-100/50">
                   <BarChart3 className="w-7 h-7 md:w-4 md:h-4 lg:w-7 lg:h-7" />
                 </div>
                 <div>
@@ -128,8 +128,8 @@ export default function HeroSection({ onLoginClick }: HeroSectionProps) {
               </div>
 
               {/* Floating Badge 3 - Top Right */}
-              <div className="absolute top-2 -right-4 md:top-2 md:-right-6 lg:top-6 lg:-right-12 z-20 bg-white p-3 md:p-2 lg:p-4 rounded-3xl shadow-2xl flex items-center gap-3 md:gap-2 lg:gap-4 animate-float [animation-delay:1.5s]">
-                <div className="w-10 h-10 md:w-7 md:h-7 lg:w-12 lg:h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600">
+              <div className="absolute top-2 -right-4 md:top-2 md:-right-6 lg:top-6 lg:-right-12 z-20 bg-white/80 backdrop-blur-md p-3 md:p-2 lg:p-4 rounded-3xl shadow-2xl flex items-center gap-3 md:gap-2 lg:gap-4 animate-float [animation-delay:1.5s]">
+                <div className="w-10 h-10 md:w-7 md:h-7 lg:w-12 lg:h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 ring-1 ring-orange-100/50">
                   <Terminal className="w-7 h-7 md:w-4 md:h-4 lg:w-7 lg:h-7" />
                 </div>
                 <div>
@@ -144,7 +144,7 @@ export default function HeroSection({ onLoginClick }: HeroSectionProps) {
 
               {/* Floating Badge 4 - Bottom Left (Below the cart) */}
               <div className="absolute -bottom-16 -left-8 md:-bottom-2 md:-left-12 lg:bottom-[-40px] lg:-left-20 z-20 bg-white p-3 md:p-2 lg:p-4 rounded-3xl shadow-2xl flex items-center gap-3 md:gap-2 lg:gap-4 animate-float [animation-delay:0.5s]">
-                <div className="w-10 h-10 md:w-7 md:h-7 lg:w-12 lg:h-12 bg-green-100 rounded-2xl flex items-center justify-center text-green-600">
+                <div className="w-10 h-10 md:w-7 md:h-7 lg:w-12 lg:h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 ring-1 ring-orange-100/50">
                   <Boxes className="w-7 h-7 md:w-4 md:h-4 lg:w-7 lg:h-7" />
                 </div>
                 <div>
