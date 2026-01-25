@@ -575,10 +575,10 @@ const POS: React.FC<POSProps> = ({
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] lg:text-base font-medium text-gray-800 truncate leading-tight">
+                    <p className="text-[13px] lg:text-base font-normal text-gray-800 truncate leading-tight">
                       {item.name}
                     </p>
-                    <p className="text-[11px] lg:text-sm font-medium text-orange-600">
+                    <p className="text-[11px] lg:text-sm font-normal text-orange-600">
                       {CURRENCY}
                       {item.price.toFixed(2)}
                     </p>
@@ -595,7 +595,7 @@ const POS: React.FC<POSProps> = ({
                         type="number"
                         value={item.quantity}
                         onChange={(e) => setQuantity(item.id, e.target.value)}
-                        className="text-[11px] font-medium w-9 text-center bg-white rounded-md border-none focus:outline-none focus:ring-0 p-0 no-spinners shadow-sm"
+                        className="text-[11px] font-normal w-9 text-center bg-white rounded-md border-none focus:outline-none focus:ring-0 p-0 no-spinners shadow-sm"
                       />
                       <button
                         onClick={() => addToCart(item)}
