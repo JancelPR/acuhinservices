@@ -34,6 +34,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({
   const [openDownloadMenu, setOpenDownloadMenu] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<"date" | "total" | "items">("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
 
   // Filtered transactions based on date range and transaction ID search
   const filteredTransactions = useMemo(() => {
@@ -216,31 +217,91 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({
 
           <div className="h-6 w-px bg-gray-200/50 hidden md:block mx-1" />
 
-          {/* Right: Sort Controls */}
-          <div className="flex items-center gap-1 bg-white/60 backdrop-blur-md border border-white/40 rounded-xl p-1 shadow-sm">
-            <div className="flex items-center gap-1.5 px-2 py-1">
-              <ArrowUpDown size={14} className="text-orange-400" />
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="text-[10px] font-bold text-gray-600 bg-transparent outline-none cursor-pointer uppercase tracking-tight"
+          {/* Right: Modern Sort Controls */}
+          <div className="flex items-center gap-1.5 bg-white/60 backdrop-blur-md border border-white/40 rounded-xl p-1 shadow-sm hover:shadow-md transition-all relative z-40">
+            <div className="relative">
+              <button
+                onClick={() => setIsSortMenuOpen(!isSortMenuOpen)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-300 group/sort ${
+                  isSortMenuOpen
+                    ? "bg-orange-50/80 shadow-inner"
+                    : "hover:bg-orange-50/50"
+                }`}
               >
-                <option value="date">Date</option>
-                <option value="total">Total</option>
-                <option value="items">Items</option>
-              </select>
+                <ArrowUpDown
+                  size={14}
+                  className={`transition-colors ${
+                    isSortMenuOpen ? "text-orange-600" : "text-orange-400"
+                  }`}
+                />
+                <span className="text-[10px] font-black text-gray-700 uppercase tracking-wider">
+                  {sortBy}
+                </span>
+                <ChevronDown
+                  size={12}
+                  className={`text-gray-400 transition-transform duration-500 ${
+                    isSortMenuOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {/* Liquid Glass Sort Menu */}
+              {isSortMenuOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setIsSortMenuOpen(false)}
+                  />
+                  <div className="absolute top-full right-0 mt-2 min-w-[120px] p-1 bg-white/90 backdrop-blur-xl border border-white/50 rounded-2xl shadow-[0_15px_35px_-10px_rgba(0,0,0,0.15)] z-[100] animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-300 origin-top">
+                    <div className="py-0.5">
+                      {[
+                        { id: "date", label: "Date" },
+                        { id: "total", label: "Total" },
+                        { id: "items", label: "Items" },
+                      ].map((option) => (
+                        <button
+                          key={option.id}
+                          onClick={() => {
+                            setSortBy(option.id as any);
+                            setIsSortMenuOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 group/opt ${
+                            sortBy === option.id
+                              ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-md shadow-orange-200"
+                              : "text-gray-500 hover:bg-orange-50/50 hover:text-orange-600"
+                          }`}
+                        >
+                          <span>{option.label}</span>
+                          {sortBy === option.id && (
+                            <div className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
+
             <div className="h-4 w-px bg-gray-200/50" />
+
             <button
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="p-1 hover:bg-orange-50 rounded-lg transition-colors text-orange-500"
+              className={`p-1.5 rounded-lg transition-all duration-300 group/order relative overflow-hidden ${
+                sortOrder === "asc"
+                  ? "text-orange-500 hover:bg-orange-50"
+                  : "text-red-500 hover:bg-red-50"
+              }`}
               title={sortOrder === "asc" ? "Sort Descending" : "Sort Ascending"}
             >
-              {sortOrder === "asc" ? (
-                <SortAsc size={16} />
-              ) : (
-                <SortDesc size={16} />
-              )}
+              <div className="relative z-10 transform group-hover/order:scale-110 active:scale-90 transition-transform">
+                {sortOrder === "asc" ? (
+                  <SortAsc size={16} />
+                ) : (
+                  <SortDesc size={16} />
+                )}
+              </div>
+              <div className="absolute inset-0 bg-current opacity-0 group-hover/order:opacity-[0.03] transition-opacity" />
             </button>
           </div>
 

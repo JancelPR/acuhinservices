@@ -58,7 +58,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const styles = getVariantStyles();
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-md transition-opacity animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[1001] flex items-center justify-center p-4 bg-black/50 backdrop-blur-md transition-opacity animate-in fade-in duration-200">
       <div
         className="bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all animate-in zoom-in-95 duration-200 overflow-hidden"
         onClick={(e) => e.stopPropagation()}

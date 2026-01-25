@@ -18,7 +18,6 @@ import {
   PlusCircle,
   PackageSearch,
 } from "lucide-react";
-import { useScrollReveal } from "../../hooks/useScrollReveal";
 import ProductCard from "../ProductCard";
 
 interface POSProps {
@@ -182,9 +181,6 @@ const POS: React.FC<POSProps> = ({
       return matchesCategory && matchesSearch;
     });
   }, [products, activeCategory, searchQuery]);
-
-  // Initialize Scroll Reveal
-  useScrollReveal([filteredProducts, searchQuery, activeCategory]);
 
   const cartTotal = useMemo(
     () => cart.reduce((sum, item) => sum + item.price * item.quantity, 0),

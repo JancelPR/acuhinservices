@@ -23,7 +23,6 @@ import {
   generateProductDescription,
   generateProductImage,
 } from "../../services/geminiService";
-import { useScrollReveal } from "../../hooks/useScrollReveal";
 import ProductCard from "../ProductCard";
 import ConfirmationModal from "../ConfirmationModal";
 import UnitSelector from "./UnitSelector";
@@ -113,9 +112,6 @@ const Inventory: React.FC<InventoryProps> = ({
       return matchesCategory && matchesSearch && matchesStock;
     });
   }, [products, searchQuery, stockFilter, activeCategory]);
-
-  // Initialize Scroll Reveal
-  useScrollReveal([filteredProducts, searchQuery, stockFilter, activeCategory]);
 
   // Wait, I missed the category filtering.
   // I should add activeCategory prop.
@@ -519,11 +515,11 @@ const Inventory: React.FC<InventoryProps> = ({
                     <Filter size={12} />
                   </div>
                   <span
-                    className={
+                    className={`truncate ${
                       activeCategory === "All"
                         ? "text-gray-500"
                         : "text-gray-900"
-                    }
+                    }`}
                   >
                     {activeCategory}
                   </span>
@@ -565,7 +561,9 @@ const Inventory: React.FC<InventoryProps> = ({
                                 : "bg-gray-200 group-hover/item:bg-orange-400"
                             }`}
                           />
-                          <span className="relative z-10">{cat}</span>
+                          <span className="relative z-10 truncate whitespace-nowrap">
+                            {cat}
+                          </span>
 
                           {activeCategory === cat && (
                             <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20 blur-sm" />
@@ -645,7 +643,7 @@ const Inventory: React.FC<InventoryProps> = ({
 
       {/* Add/Edit Product Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all duration-300">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-[1000] p-4 transition-all duration-300">
           <div className="bg-white rounded-[24px] w-full max-w-md shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col max-h-[90vh] border border-gray-100/50">
             {/* Modal Header */}
             <div className="px-6 py-4 flex justify-between items-center bg-white border-b border-gray-50">
