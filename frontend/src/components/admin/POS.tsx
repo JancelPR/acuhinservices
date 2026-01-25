@@ -643,7 +643,7 @@ const POS: React.FC<POSProps> = ({
             <button
               onClick={handleCheckout}
               disabled={cart.length === 0}
-              className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-3 lg:py-3.5 rounded-xl lg:rounded-2xl font-bold text-sm flex items-center justify-center gap-2 lg:gap-3 hover:from-orange-600 hover:to-red-700 disabled:from-gray-300 disabled:to-gray-200 disabled:cursor-not-allowed transition-all shadow-lg shadow-orange-200/50 hover:shadow-orange-200 active:scale-[0.98]"
+              className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-3 lg:py-3.5 rounded-xl lg:rounded-2xl font-bold text-sm flex items-center justify-center gap-2 lg:gap-3 hover:from-orange-600 hover:to-red-700 disabled:from-gray-300 disabled:to-gray-200 disabled:cursor-not-allowed transition-all shadow-lg shadow-orange-200/50 hover:shadow-orange-200 active:scale-[0.98] mb-1 md:mb-2"
             >
               <CreditCard size={18} className="lg:w-5 lg:h-5" />
               <span>Confirm & Checkout</span>

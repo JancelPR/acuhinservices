@@ -33,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <div
       onClick={() => !isAdmin && isAvailable && onAddToCart?.(product)}
-      className={`reveal-on-scroll reveal-fade-up bg-white p-1 md:p-1.5 rounded-xl md:rounded-2xl shadow-sm hover:shadow-lg transition-all duration-500 group relative w-full
+      className={`reveal-on-scroll reveal-fade-up bg-gray-200/90 backdrop-blur-xl border border-gray-300/50 p-1 md:p-1.5 rounded-xl md:rounded-2xl shadow-sm hover:shadow-lg transition-all duration-500 group relative w-full
       ${!isAdmin && isAvailable ? "cursor-pointer" : ""}
       ${
         !isAvailable && !isAdmin
