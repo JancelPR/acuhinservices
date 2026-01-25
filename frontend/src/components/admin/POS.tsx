@@ -62,6 +62,11 @@ const POS: React.FC<POSProps> = ({
   };
 
   useEffect(() => {
+    // Reset category to "All" when navigation back to POS
+    onCategoryChange("All");
+  }, []);
+
+  useEffect(() => {
     // Initial check and set up observer for content changes
     setTimeout(checkScroll, 100);
 
@@ -354,7 +359,7 @@ const POS: React.FC<POSProps> = ({
       quantity: 1,
       category: "Miscellaneous",
       stock: 99999, // Effectively infinite for custom items
-      image: "https://placehold.co/100x100?text=Misc",
+      image: "https://placehold.co/400x400/fbbf24/ffffff?text=Misc",
     };
 
     setCart((prev) => [...prev, customItem]);
@@ -435,10 +440,10 @@ const POS: React.FC<POSProps> = ({
                   <button
                     key={cat}
                     onClick={() => onCategoryChange(cat)}
-                    className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 active:scale-95 whitespace-nowrap ${
+                    className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 active:scale-95 whitespace-nowrap ${
                       activeCategory === cat
-                        ? "bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg shadow-orange-200"
-                        : "bg-white text-slate-600 border border-gray-100 hover:bg-orange-50/50 shadow-sm"
+                        ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-200/50"
+                        : "bg-white text-gray-600 border border-gray-100 hover:bg-orange-50 hover:text-orange-600 shadow-sm"
                     }`}
                   >
                     {cat}
@@ -598,9 +603,9 @@ const POS: React.FC<POSProps> = ({
                       />
                       <button
                         onClick={() => addToCart(item)}
-                        className="w-6 h-6 flex items-center justify-center text-gray-500 hover:bg-white hover:shadow-sm rounded-full transition-all"
+                        className="w-6 h-6 flex items-center justify-center bg-orange-50 text-orange-400 hover:bg-orange-100 rounded-full transition-all shadow-sm"
                       >
-                        <Plus size={10} />
+                        <Plus size={12} />
                       </button>
                     </div>
                     <button
@@ -643,7 +648,7 @@ const POS: React.FC<POSProps> = ({
             <button
               onClick={handleCheckout}
               disabled={cart.length === 0}
-              className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-3 lg:py-3.5 rounded-xl lg:rounded-2xl font-bold text-sm flex items-center justify-center gap-2 lg:gap-3 hover:from-orange-600 hover:to-red-700 disabled:from-gray-300 disabled:to-gray-200 disabled:cursor-not-allowed transition-all shadow-lg shadow-orange-200/50 hover:shadow-orange-200 active:scale-[0.98] mb-1 md:mb-2"
+              className="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-white py-3 lg:py-3.5 rounded-xl lg:rounded-2xl font-bold text-sm flex items-center justify-center gap-2 lg:gap-3 hover:from-amber-500 hover:to-orange-600 disabled:from-gray-300 disabled:to-gray-200 disabled:cursor-not-allowed transition-all shadow-[0_10px_20px_-5px_rgba(245,158,11,0.3)] hover:shadow-orange-200 active:scale-[0.98] mb-1 md:mb-2"
             >
               <CreditCard size={18} className="lg:w-5 lg:h-5" />
               <span>Confirm & Checkout</span>

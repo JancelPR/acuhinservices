@@ -15,6 +15,8 @@ import {
   AlertCircle,
   Trash2,
   Barcode,
+  Filter,
+  ChevronDown,
 } from "lucide-react";
 import { api } from "../../services/api";
 import {
@@ -31,7 +33,6 @@ interface InventoryProps {
   setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
   categories: string[];
   setCategories: React.Dispatch<React.SetStateAction<string[]>>;
-  activeCategory: string;
   onAddCategory: (newCategory: string) => Promise<void>;
   isSidebarCollapsed?: boolean;
 }
@@ -41,10 +42,10 @@ const Inventory: React.FC<InventoryProps> = ({
   setProducts,
   categories,
   setCategories,
-  activeCategory,
   onAddCategory,
   isSidebarCollapsed,
 }) => {
+  const [activeCategory, setActiveCategory] = useState("All");
   const DEFAULT_UNITS = ["pc", "pack", "sachet", "rim", "sack", "stick", "kg"];
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -65,6 +66,7 @@ const Inventory: React.FC<InventoryProps> = ({
 
   const [isStockFocused, setIsStockFocused] = useState(false);
   const [isStockAlertFocused, setIsStockAlertFocused] = useState(false);
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
 
   // Confirmation Modal State
   const [confirmModal, setConfirmModal] = useState<{
@@ -126,6 +128,11 @@ const Inventory: React.FC<InventoryProps> = ({
     }),
     [products],
   );
+
+  const sortedCategories = useMemo(() => {
+    const cats = categories.filter((c) => c !== "All");
+    return ["All", ...cats.sort((a, b) => a.localeCompare(b))];
+  }, [categories]);
 
   const availableUnits = useMemo(() => {
     const units = new Set(DEFAULT_UNITS);
@@ -484,18 +491,98 @@ const Inventory: React.FC<InventoryProps> = ({
         <div className="flex flex-col md:flex-row gap-3 items-start md:items-center justify-between px-2 py-1">
           <button
             onClick={handleAddProduct}
-            className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:from-orange-600 hover:to-red-700 transition-all text-sm font-bold shadow-lg shadow-orange-200/50 active:scale-95 whitespace-nowrap"
+            className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:from-orange-600 hover:to-red-700 transition-all duration-300 text-sm font-bold shadow-lg shadow-orange-200/50 active:scale-95 whitespace-nowrap"
           >
             <Plus size={18} />
             <span>New Product</span>
           </button>
 
           <div className="flex flex-wrap gap-2 items-center w-full md:w-auto">
+            {/* Premium Category Filter Dropdown */}
+            <div className="relative w-full md:w-auto min-w-[160px] z-[100]">
+              <button
+                onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
+                className={`w-full flex items-center justify-between pl-3 pr-2 py-1.5 bg-white/80 backdrop-blur-md border rounded-xl text-xs font-bold transition-all duration-300 shadow-sm hover:shadow-md group ${
+                  isCategoryMenuOpen
+                    ? "border-orange-200 ring-4 ring-orange-500/5 shadow-inner"
+                    : "border-gray-100 hover:border-orange-100"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`p-1 rounded-lg transition-colors ${
+                      activeCategory === "All"
+                        ? "bg-gray-50 text-gray-400"
+                        : "bg-orange-50 text-orange-500"
+                    }`}
+                  >
+                    <Filter size={12} />
+                  </div>
+                  <span
+                    className={
+                      activeCategory === "All"
+                        ? "text-gray-500"
+                        : "text-gray-900"
+                    }
+                  >
+                    {activeCategory}
+                  </span>
+                </div>
+                <ChevronDown
+                  size={14}
+                  className={`text-gray-400 transition-transform duration-500 ${
+                    isCategoryMenuOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {/* Animated Floating Menu */}
+              {isCategoryMenuOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setIsCategoryMenuOpen(false)}
+                  />
+                  <div className="absolute top-full left-0 right-0 mt-1.5 p-1 bg-white/90 backdrop-blur-xl border border-white/50 rounded-2xl shadow-[0_15px_40px_-12px_rgba(0,0,0,0.15)] z-20 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-300 origin-top overflow-hidden">
+                    <div className="max-h-[200px] overflow-y-auto no-scrollbar py-1">
+                      {sortedCategories.map((cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => {
+                            setActiveCategory(cat);
+                            setIsCategoryMenuOpen(false);
+                          }}
+                          className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all duration-200 group/item relative overflow-hidden ${
+                            activeCategory === cat
+                              ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-200"
+                              : "text-gray-600 hover:bg-orange-50/50 hover:text-orange-600"
+                          }`}
+                        >
+                          <div
+                            className={`w-1.5 h-1.5 rounded-full transition-transform duration-500 group-hover/item:scale-150 ${
+                              activeCategory === cat
+                                ? "bg-white"
+                                : "bg-gray-200 group-hover/item:bg-orange-400"
+                            }`}
+                          />
+                          <span className="relative z-10">{cat}</span>
+
+                          {activeCategory === cat && (
+                            <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20 blur-sm" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
             <button
               onClick={() => setStockFilter("all")}
               className={`flex-1 md:flex-none px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
                 stockFilter === "all"
-                  ? "bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg shadow-orange-200"
+                  ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-200/50"
                   : "bg-white text-gray-500 hover:bg-orange-50/50 border border-gray-100 shadow-sm"
               }`}
             >

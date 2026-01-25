@@ -237,7 +237,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   setProducts={setProducts}
                   categories={categories}
                   setCategories={setCategories}
-                  activeCategory={activeCategory}
                   onAddCategory={handleAddCategory}
                   isSidebarCollapsed={isSidebarCollapsed}
                 />
