@@ -66,6 +66,7 @@ const Inventory: React.FC<InventoryProps> = ({
   const [isStockFocused, setIsStockFocused] = useState(false);
   const [isStockAlertFocused, setIsStockAlertFocused] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
+  const [isModalCategoryOpen, setIsModalCategoryOpen] = useState(false);
 
   // Confirmation Modal State
   const [confirmModal, setConfirmModal] = useState<{
@@ -140,12 +141,12 @@ const Inventory: React.FC<InventoryProps> = ({
 
   const handleAddProduct = () => {
     setCurrentProduct({
-      category: "Snacks",
+      category: "" as any,
       stock: 0,
       price: 0,
       image: "",
-      unit: "pc",
-      lowStockThreshold: 5, // Default threshold
+      unit: "",
+      lowStockThreshold: 0,
     });
     setIsEditing(false);
     setIsModalOpen(true);
@@ -652,7 +653,7 @@ const Inventory: React.FC<InventoryProps> = ({
                   className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                     isEditing
                       ? "bg-orange-50 text-orange-600"
-                      : "bg-emerald-50 text-emerald-600"
+                      : "bg-orange-50 text-orange-600 shadow-sm"
                   }`}
                 >
                   {isEditing ? <Wand2 size={20} /> : <Plus size={20} />}
@@ -679,7 +680,7 @@ const Inventory: React.FC<InventoryProps> = ({
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 overflow-y-auto no-scrollbar space-y-5">
+            <div className="p-6 overflow-visible space-y-5">
               {/* Image Section - More compact at top */}
               <div className="flex gap-4 items-center">
                 <div className="relative group">
@@ -747,30 +748,30 @@ const Inventory: React.FC<InventoryProps> = ({
                   />
                 </div>
 
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
-                    Barcode
-                  </label>
-                  <div className="relative group">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors">
-                      <Barcode size={16} />
-                    </div>
-                    <input
-                      type="text"
-                      value={currentProduct.barcode || ""}
-                      onChange={(e) =>
-                        setCurrentProduct({
-                          ...currentProduct,
-                          barcode: e.target.value,
-                        })
-                      }
-                      className="w-full bg-gray-50 border-0 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-sm transition-all border border-gray-100"
-                      placeholder="Scan or enter barcode"
-                    />
-                  </div>
-                </div>
-
                 <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
+                      Barcode
+                    </label>
+                    <div className="relative group">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors">
+                        <Barcode size={16} />
+                      </div>
+                      <input
+                        type="text"
+                        value={currentProduct.barcode || ""}
+                        onChange={(e) =>
+                          setCurrentProduct({
+                            ...currentProduct,
+                            barcode: e.target.value,
+                          })
+                        }
+                        className="w-full bg-gray-50 border-0 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-sm transition-all border border-gray-100 placeholder:text-[11px]"
+                        placeholder="Scan or enter barcode"
+                      />
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
                       Category <span className="text-red-500">*</span>
@@ -805,56 +806,89 @@ const Inventory: React.FC<InventoryProps> = ({
                         </button>
                       </div>
                     ) : (
-                      <select
-                        value={currentProduct.category}
-                        onChange={(e) => {
-                          if (e.target.value === "__add_new__") {
-                            setIsAddingNewCategory(true);
-                          } else {
-                            setCurrentProduct({
-                              ...currentProduct,
-                              category: e.target.value as CategoryType,
-                            });
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setIsModalCategoryOpen(!isModalCategoryOpen)
                           }
-                        }}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-500/20 text-gray-900 cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2210%22%20height%3D%226%22%20viewBox%3D%220%200%2010%206%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M1%201L5%205L9%201%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:10px_6px] bg-[position:right_12px_center] bg-no-repeat"
-                      >
-                        {categories
-                          .filter((c) => c !== "All")
-                          .map((c) => (
-                            <option key={c} value={c}>
-                              {c}
-                            </option>
-                          ))}
-                        <option value="__add_new__">+ Add new</option>
-                      </select>
+                          className={`w-full flex items-center justify-between px-3 py-2 bg-gray-50/50 border rounded-2xl text-sm transition-all duration-300 group ${
+                            isModalCategoryOpen
+                              ? "border-orange-200 ring-4 ring-orange-500/5 bg-white shadow-inner"
+                              : "border-gray-100 hover:border-orange-100 hover:bg-gray-50"
+                          }`}
+                        >
+                          <span
+                            className={`truncate text-[13px] font-semibold ${currentProduct.category ? "text-gray-900" : "text-gray-400"}`}
+                          >
+                            {currentProduct.category || "Select"}
+                          </span>
+                          <ChevronDown
+                            size={14}
+                            className={`text-gray-400 transition-transform duration-500 ${
+                              isModalCategoryOpen ? "rotate-180" : ""
+                            }`}
+                          />
+                        </button>
+
+                        {/* Liquid Dropdown Menu */}
+                        {isModalCategoryOpen && (
+                          <>
+                            <div
+                              className="fixed inset-0 z-[1001]"
+                              onClick={() => setIsModalCategoryOpen(false)}
+                            />
+                            <div className="absolute top-[-2px] left-[-2px] right-[-2px] p-1 bg-white border border-orange-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[1002] animate-in fade-in zoom-in-95 duration-300 origin-top overflow-hidden">
+                              <div className="max-h-[160px] overflow-y-auto no-scrollbar py-0.5">
+                                {categories
+                                  .filter((cat) => cat !== "All")
+                                  .map((cat) => (
+                                    <button
+                                      key={cat}
+                                      type="button"
+                                      onClick={() => {
+                                        setCurrentProduct({
+                                          ...currentProduct,
+                                          category: cat as CategoryType,
+                                        });
+                                        setIsModalCategoryOpen(false);
+                                      }}
+                                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all duration-200 group/item relative overflow-hidden ${
+                                        currentProduct.category === cat
+                                          ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-200/50"
+                                          : "text-gray-600 hover:bg-orange-50/50 hover:text-orange-600"
+                                      }`}
+                                    >
+                                      <div
+                                        className={`w-1.5 h-1.5 rounded-full transition-transform duration-500 ${
+                                          currentProduct.category === cat
+                                            ? "bg-white"
+                                            : "bg-gray-200 group-hover/item:bg-orange-400 group-hover/item:scale-150"
+                                        }`}
+                                      />
+                                      <span className="relative z-10 truncate">
+                                        {cat}
+                                      </span>
+                                    </button>
+                                  ))}
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsAddingNewCategory(true);
+                                    setIsModalCategoryOpen(false);
+                                  }}
+                                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest text-orange-500 hover:bg-orange-50/50 transition-all mt-0.5"
+                                >
+                                  <Plus size={14} />
+                                  <span>Add New</span>
+                                </button>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     )}
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
-                      Stock Level <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      value={
-                        isStockFocused && currentProduct.stock === 0
-                          ? ""
-                          : currentProduct.stock || 0
-                      }
-                      onChange={(e) => {
-                        const val =
-                          e.target.value === "" ? 0 : Number(e.target.value);
-                        setCurrentProduct({ ...currentProduct, stock: val });
-                      }}
-                      onFocus={() => setIsStockFocused(true)}
-                      onBlur={(e) => {
-                        setIsStockFocused(false);
-                        if (e.target.value === "" || e.target.value === "0") {
-                          setCurrentProduct({ ...currentProduct, stock: 0 });
-                        }
-                      }}
-                      className="w-full bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-500/20 text-gray-900 transition-all focus:bg-white"
-                    />
                   </div>
                 </div>
 
@@ -864,7 +898,7 @@ const Inventory: React.FC<InventoryProps> = ({
                       Price Details <span className="text-red-500">*</span>
                     </label>
                     <div className="relative group">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-semibold">
                         {CURRENCY}
                       </span>
                       <input
@@ -886,7 +920,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             setCurrentProduct({ ...currentProduct, price: 0 });
                           }
                         }}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-6 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-500/20 text-gray-900 font-bold transition-all focus:bg-white"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-6 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-500/20 text-gray-900 transition-all focus:bg-white"
                       />
                     </div>
                   </div>
@@ -925,7 +959,7 @@ const Inventory: React.FC<InventoryProps> = ({
                         </div>
                       ) : (
                         <UnitSelector
-                          value={currentProduct.unit || "pc"}
+                          value={currentProduct.unit || ""}
                           onChange={(val) => {
                             if (val === "custom") {
                               setIsCustomUnit(true);
@@ -949,80 +983,108 @@ const Inventory: React.FC<InventoryProps> = ({
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
-                    Stock Alert{" "}
-                    <span className="text-[9px] font-normal text-gray-400 lowercase italic">
-                      (notifies when stock reaches this level)
-                    </span>
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400">
-                      <AlertCircle size={16} />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1 truncate">
+                      Stock Alert
+                    </label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-400">
+                        <AlertCircle size={16} />
+                      </div>
+                      <input
+                        type="number"
+                        value={
+                          isStockAlertFocused &&
+                          currentProduct.lowStockThreshold === 0
+                            ? ""
+                            : currentProduct.lowStockThreshold || 0
+                        }
+                        onChange={(e) => {
+                          const val =
+                            e.target.value === "" ? 0 : Number(e.target.value);
+                          setCurrentProduct({
+                            ...currentProduct,
+                            lowStockThreshold: val,
+                          });
+                        }}
+                        onFocus={() => setIsStockAlertFocused(true)}
+                        onBlur={(e) => {
+                          setIsStockAlertFocused(false);
+                          if (e.target.value === "" || e.target.value === "0") {
+                            setCurrentProduct({
+                              ...currentProduct,
+                              lowStockThreshold: 0,
+                            });
+                          }
+                        }}
+                        placeholder="Threshold"
+                        className="w-full bg-gray-50 border-0 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-sm transition-all border border-gray-100"
+                      />
                     </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
+                      Stock Quantity <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="number"
                       value={
-                        isStockAlertFocused &&
-                        currentProduct.lowStockThreshold === 0
+                        isStockFocused && currentProduct.stock === 0
                           ? ""
-                          : currentProduct.lowStockThreshold || 0
+                          : currentProduct.stock || 0
                       }
                       onChange={(e) => {
                         const val =
                           e.target.value === "" ? 0 : Number(e.target.value);
-                        setCurrentProduct({
-                          ...currentProduct,
-                          lowStockThreshold: val,
-                        });
+                        setCurrentProduct({ ...currentProduct, stock: val });
                       }}
-                      onFocus={() => setIsStockAlertFocused(true)}
+                      onFocus={() => setIsStockFocused(true)}
                       onBlur={(e) => {
-                        setIsStockAlertFocused(false);
+                        setIsStockFocused(false);
                         if (e.target.value === "" || e.target.value === "0") {
-                          setCurrentProduct({
-                            ...currentProduct,
-                            lowStockThreshold: 0,
-                          });
+                          setCurrentProduct({ ...currentProduct, stock: 0 });
                         }
                       }}
-                      placeholder="Enter minimum threshold (optional)"
-                      className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-11 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-500/10 focus:border-orange-200 text-gray-900 transition-all focus:bg-white"
+                      className="w-full bg-gray-50 border-0 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-sm transition-all border border-gray-100"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <div className="flex justify-between items-center mb-1.5 ml-1">
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                      Description
-                    </label>
-                    {(!currentProduct.description ||
-                      currentProduct.description.trim() === "") && (
-                      <button
-                        onClick={handleGenerateDescription}
-                        disabled={isGeneratingAI || !currentProduct.name}
-                        className="text-[10px] font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1 disabled:opacity-40 transition-colors"
-                      >
-                        <Wand2 size={10} />
-                        {isGeneratingAI ? "Writing..." : "AI Write"}
-                      </button>
-                    )}
+                {/* Temporarily hidden */}
+                {false && (
+                  <div>
+                    <div className="flex justify-between items-center mb-1.5 ml-1">
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                        Description
+                      </label>
+                      {(!currentProduct.description ||
+                        currentProduct.description.trim() === "") && (
+                        <button
+                          onClick={handleGenerateDescription}
+                          disabled={isGeneratingAI || !currentProduct.name}
+                          className="text-[10px] font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1 disabled:opacity-40 transition-colors"
+                        >
+                          <Wand2 size={10} />
+                          {isGeneratingAI ? "Writing..." : "AI Write"}
+                        </button>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <textarea
+                        value={currentProduct.description || ""}
+                        onChange={(e) =>
+                          setCurrentProduct({
+                            ...currentProduct,
+                            description: e.target.value,
+                          })
+                        }
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 h-20 text-sm outline-none resize-none focus:ring-2 focus:ring-orange-500/20 text-gray-600 leading-relaxed"
+                        placeholder="Product highlights..."
+                      ></textarea>
+                    </div>
                   </div>
-                  <div className="relative">
-                    <textarea
-                      value={currentProduct.description || ""}
-                      onChange={(e) =>
-                        setCurrentProduct({
-                          ...currentProduct,
-                          description: e.target.value,
-                        })
-                      }
-                      className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 h-20 text-sm outline-none resize-none focus:ring-2 focus:ring-orange-500/20 text-gray-600 leading-relaxed"
-                      placeholder="Product highlights..."
-                    ></textarea>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
 
@@ -1054,7 +1116,7 @@ const Inventory: React.FC<InventoryProps> = ({
                 className={`sm:w-auto px-8 py-2.5 text-sm font-bold text-white rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${
                   isEditing
                     ? "bg-gradient-to-r from-orange-500 to-red-600 shadow-orange-200"
-                    : "bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-emerald-200"
+                    : "bg-gradient-to-r from-orange-500/90 to-red-600 shadow-orange-100"
                 }`}
               >
                 <Save size={18} />

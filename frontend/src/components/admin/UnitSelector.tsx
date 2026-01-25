@@ -65,7 +65,7 @@ const UnitSelector: React.FC<UnitSelectorProps> = ({
     e.stopPropagation();
     if (
       confirm(
-        `Are you sure you want to delete unit "${unit}"? Items will be reset to "pc".`
+        `Are you sure you want to delete unit "${unit}"? Items will be reset to "pc".`,
       )
     ) {
       onDeleteUnit(unit);
@@ -83,105 +83,154 @@ const UnitSelector: React.FC<UnitSelectorProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 bg-white text-sm focus:ring-2 focus:ring-purple-500 outline-none transition-all"
+        className={`w-full flex items-center justify-between px-3 py-2 bg-gray-50/50 border rounded-2xl text-sm transition-all duration-300 group ${
+          isOpen
+            ? "border-orange-200 ring-4 ring-orange-500/5 bg-white shadow-inner"
+            : "border-gray-100 hover:border-orange-100 hover:bg-gray-50"
+        }`}
       >
-        <span className="text-gray-900 truncate">{value || "Select Unit"}</span>
-        <ChevronDown size={14} className="text-gray-400" />
+        <span
+          className={`truncate text-[13px] font-semibold ${value ? "text-gray-900" : "text-gray-400"}`}
+        >
+          {value || "Select"}
+        </span>
+        <ChevronDown
+          size={14}
+          className={`text-gray-400 transition-transform duration-500 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-100 z-50 max-h-48 overflow-y-auto w-48 custom-scrollbar">
-          <div className="py-1">
-            {units.map((unit) => (
-              <div
-                key={unit}
-                className={`group flex items-center justify-between px-3 py-2 hover:bg-gray-50 cursor-pointer ${
-                  value === unit
-                    ? "bg-purple-50 text-purple-700 font-medium"
-                    : "text-gray-700"
-                }`}
+        <>
+          <div
+            className="fixed inset-0 z-[1001]"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="absolute top-[-2px] left-[-2px] right-[-2px] p-1 bg-white border border-orange-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[1002] animate-in fade-in zoom-in-95 duration-300 origin-top overflow-hidden">
+            <div className="max-h-[160px] overflow-y-auto no-scrollbar py-0.5">
+              {units.map((unit) => (
+                <div
+                  key={unit}
+                  className={`group flex items-center justify-between px-3 py-1.5 rounded-xl transition-all duration-200 cursor-pointer relative overflow-hidden ${
+                    value === unit
+                      ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-200/50"
+                      : "text-gray-600 hover:bg-orange-50/50 hover:text-orange-600"
+                  }`}
+                  onClick={() => {
+                    if (editingUnit !== unit) {
+                      onChange(unit);
+                      setIsOpen(false);
+                    }
+                  }}
+                >
+                  {editingUnit === unit ? (
+                    <div
+                      className="flex items-center gap-1 w-full relative z-10"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        className="w-full text-[11px] font-bold px-2 py-1 bg-white/20 border border-white/30 rounded-lg text-white placeholder:text-white/50 outline-none focus:ring-2 focus:ring-white/50"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleSaveEdit(unit);
+                          if (e.key === "Escape") setEditingUnit(null);
+                        }}
+                      />
+                      <button
+                        onClick={() => handleSaveEdit(unit)}
+                        className="p-1 text-white hover:bg-white/20 rounded-lg transition-colors"
+                      >
+                        <Check size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-2.5 truncate">
+                        <div
+                          className={`w-1.5 h-1.5 rounded-full transition-transform duration-500 ${
+                            value === unit
+                              ? "bg-white"
+                              : "bg-gray-200 group-hover:bg-orange-400 group-hover:scale-150"
+                          }`}
+                        />
+                        <span className="text-[11px] font-bold uppercase tracking-widest truncate">
+                          {unit}
+                        </span>
+                      </div>
+
+                      <div className="relative">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveMenu(activeMenu === unit ? null : unit);
+                          }}
+                          className={`p-1 rounded-lg transition-all ${
+                            value === unit
+                              ? "text-white/70 hover:text-white hover:bg-white/10"
+                              : "text-gray-300 hover:text-gray-600 hover:bg-gray-100"
+                          }`}
+                        >
+                          <MoreHorizontal size={14} />
+                        </button>
+
+                        {activeMenu === unit && (
+                          <>
+                            <div
+                              className="fixed inset-0 z-[1003]"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveMenu(null);
+                              }}
+                            />
+                            <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 py-1 w-28 z-[1004] animate-in fade-in zoom-in-95 duration-200">
+                              <button
+                                onClick={(e) => handleEditClick(unit, e)}
+                                className="w-full text-left px-3 py-1.5 text-[10px] font-bold text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <Edit2 size={12} className="text-orange-500" />{" "}
+                                Edit
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (confirm(`Delete unit "${unit}"?`)) {
+                                    onDeleteUnit(unit);
+                                    if (value === unit) onChange("pc");
+                                  }
+                                  setActiveMenu(null);
+                                }}
+                                className="w-full text-left px-3 py-1.5 text-[10px] font-bold text-red-500 hover:bg-red-50 flex items-center gap-2"
+                              >
+                                <Trash2 size={12} /> Delete
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+
+              <button
+                type="button"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest text-orange-500 hover:bg-orange-50 transition-all mt-0.5"
                 onClick={() => {
-                  if (editingUnit !== unit) {
-                    onChange(unit);
-                    setIsOpen(false);
-                  }
+                  onChange("custom");
+                  setIsOpen(false);
                 }}
               >
-                {editingUnit === unit ? (
-                  <div
-                    className="flex items-center gap-1 w-full"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <input
-                      type="text"
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      className="w-full text-xs px-1 py-0.5 border border-purple-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
-                      autoFocus
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") handleSaveEdit(unit);
-                        if (e.key === "Escape") setEditingUnit(null);
-                      }}
-                    />
-                    <button
-                      onClick={() => handleSaveEdit(unit)}
-                      className="p-1 text-green-600 hover:bg-green-100 rounded"
-                    >
-                      <Check size={12} />
-                    </button>
-                    <button
-                      onClick={() => setEditingUnit(null)}
-                      className="p-1 text-gray-400 hover:bg-gray-100 rounded"
-                    >
-                      <X size={12} />
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <span className="truncate flex-1">{unit}</span>
-                    <div className="relative">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveMenu(activeMenu === unit ? null : unit);
-                        }}
-                        className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
-                      >
-                        <MoreHorizontal size={14} />
-                      </button>
-                      {activeMenu === unit && (
-                        <div className="absolute right-0 top-full mt-1 bg-white rounded-md shadow-lg border border-gray-100 py-1 w-24 z-50">
-                          <button
-                            onClick={(e) => handleEditClick(unit, e)}
-                            className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                          >
-                            <Edit2 size={10} /> Edit
-                          </button>
-                          <button
-                            onClick={(e) => handleDeleteClick(unit, e)}
-                            className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2"
-                          >
-                            <Trash2 size={10} /> Delete
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
-
-            <div
-              className="border-t border-gray-100 mt-1 pt-1 px-3 py-2 text-blue-600 hover:bg-blue-50 cursor-pointer text-xs font-medium flex items-center gap-2"
-              onClick={() => {
-                onChange("custom");
-                setIsOpen(false);
-              }}
-            >
-              <Plus size={12} /> Add Custom Unit...
+                <Plus size={14} />
+                <span>Custom Unit</span>
+              </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
