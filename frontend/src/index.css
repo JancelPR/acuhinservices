@@ -170,3 +170,6 @@ input[type="number"] {
 .delay-700 { animation-delay: 700ms; }
 
 
+.font-roboto {
+  font-family: 'Roboto', sans-serif;
+}
