@@ -1005,7 +1005,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             e.target.value === "" ? 0 : Number(e.target.value);
                           setCurrentProduct({
                             ...currentProduct,
-                            lowStockThreshold: val,
+                            lowStockThreshold: Math.min(9999, val),
                           });
                         }}
                         onFocus={() => setIsStockAlertFocused(true)}
@@ -1029,6 +1029,7 @@ const Inventory: React.FC<InventoryProps> = ({
                     </label>
                     <input
                       type="number"
+                      max="9999"
                       value={
                         isStockFocused && currentProduct.stock === 0
                           ? ""
@@ -1037,7 +1038,10 @@ const Inventory: React.FC<InventoryProps> = ({
                       onChange={(e) => {
                         const val =
                           e.target.value === "" ? 0 : Number(e.target.value);
-                        setCurrentProduct({ ...currentProduct, stock: val });
+                        setCurrentProduct({
+                          ...currentProduct,
+                          stock: Math.min(9999, val),
+                        });
                       }}
                       onFocus={() => setIsStockFocused(true)}
                       onBlur={(e) => {

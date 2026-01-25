@@ -154,6 +154,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 {CURRENCY}
               </span>
               {product.price}
+              {product.unit && (
+                <span className="text-[9px] md:text-[11px] font-normal text-gray-600 ml-1 lowercase flex items-baseline">
+                  <span className="text-gray-400 mx-0.5 scale-90">/</span>
+                  {product.unit}
+                </span>
+              )}
             </div>
           </div>
 
@@ -164,8 +170,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
           )}
 
           {isAdmin && (
-            <div className="text-[9px] md:text-[11px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">
-              Qty: {product.stock}
+            <div className="text-[9px] md:text-[11px] font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg whitespace-nowrap">
+              Qty: {product.stock > 9999 ? "9999+" : product.stock}
             </div>
           )}
         </div>
