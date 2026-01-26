@@ -48,6 +48,7 @@ const POS: React.FC<POSProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const cartContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
@@ -64,6 +65,16 @@ const POS: React.FC<POSProps> = ({
     // Reset category to "All" when navigation back to POS
     onCategoryChange("All");
   }, []);
+
+  // Auto-scroll cart to bottom when items are added
+  useEffect(() => {
+    if (cartContainerRef.current) {
+      cartContainerRef.current.scrollTo({
+        top: cartContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [cart]);
 
   useEffect(() => {
     // Initial check and set up observer for content changes
@@ -545,9 +556,16 @@ const POS: React.FC<POSProps> = ({
           </div>
 
           <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between flex-shrink-0">
-            <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
-              <ShoppingCart size={22} className="text-orange-500" /> Current
-              Order
+            <h3 className="font-bold text-gray-800 text-lg flex items-center gap-4">
+              <div className="relative">
+                <ShoppingCart size={22} className="text-orange-500" />
+                {cart.length > 0 && (
+                  <span className="absolute -top-2.5 -right-2.5 text-red-500 text-[11px] font-black animate-in fade-in duration-300">
+                    {cart.length}
+                  </span>
+                )}
+              </div>
+              Current Order
             </h3>
 
             <button
@@ -558,7 +576,10 @@ const POS: React.FC<POSProps> = ({
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-2 no-scrollbar">
+          <div
+            ref={cartContainerRef}
+            className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-2 no-scrollbar"
+          >
             {cart.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-4">
                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center">

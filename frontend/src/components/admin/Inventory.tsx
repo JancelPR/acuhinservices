@@ -819,7 +819,7 @@ const Inventory: React.FC<InventoryProps> = ({
                           }`}
                         >
                           <span
-                            className={`truncate text-[13px] font-semibold ${currentProduct.category ? "text-gray-900" : "text-gray-400"}`}
+                            className={`truncate text-[13px] font-medium ${currentProduct.category ? "text-gray-900" : "text-gray-400"}`}
                           >
                             {currentProduct.category || "Select"}
                           </span>
@@ -853,7 +853,7 @@ const Inventory: React.FC<InventoryProps> = ({
                                         });
                                         setIsModalCategoryOpen(false);
                                       }}
-                                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all duration-200 group/item relative overflow-hidden ${
+                                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[11px] font-medium uppercase tracking-widest transition-all duration-200 group/item relative overflow-hidden ${
                                         currentProduct.category === cat
                                           ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-200/50"
                                           : "text-gray-600 hover:bg-orange-50/50 hover:text-orange-600"
