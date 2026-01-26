@@ -380,7 +380,7 @@ const POS: React.FC<POSProps> = ({
   return (
     <div className="flex flex-col h-full bg-gray-50 overflow-hidden">
       {/* Unified POS Header with Pill Categories Stacking */}
-      <div className="bg-transparent px-4 pt-0 pb-2 flex flex-col gap-2 flex-shrink-0">
+      <div className="bg-transparent px-4 pt-0 pb-1.5 flex flex-col gap-1.5 flex-shrink-0">
         {/* Terminal Header */}
         <div className="flex items-center justify-between py-3 px-6 bg-white/60 backdrop-blur-xl rounded-[2rem] shadow-[0_15px_35px_-5px_rgba(249,115,22,0.12),0_5px_15px_-3px_rgba(0,0,0,0.04)] relative overflow-hidden group border-none">
           {/* Subtle Inner Glow */}
@@ -417,9 +417,9 @@ const POS: React.FC<POSProps> = ({
           <div className="absolute -left-1/4 top-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-150%] group-hover:translate-x-[350%] transition-transform duration-[1500ms]" />
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           {/* Advanced Category Navigation */}
-          <div className="relative flex items-center group/nav px-2 py-1">
+          <div className="relative flex items-center group/nav px-2 py-0.5">
             {/* Left Fade Overlay */}
             {canScrollLeft && (
               <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none" />
@@ -441,7 +441,7 @@ const POS: React.FC<POSProps> = ({
             <div
               ref={scrollContainerRef}
               onScroll={checkScroll}
-              className="overflow-x-auto no-scrollbar scroll-smooth w-full flex items-center py-2"
+              className="overflow-x-auto no-scrollbar scroll-smooth w-full flex items-center py-1.5"
             >
               <div className="flex items-center gap-3 px-4 min-w-max">
                 {(categories.includes("All")
