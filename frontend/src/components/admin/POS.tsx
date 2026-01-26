@@ -418,28 +418,32 @@ const POS: React.FC<POSProps> = ({
         </div>
 
         <div className="flex flex-col gap-2">
-          {/* Scrollable Category Pills with Arrows */}
-          <div className="relative flex items-center group/nav">
+          {/* Advanced Category Navigation */}
+          <div className="relative flex items-center group/nav px-2 py-1">
+            {/* Left Fade Overlay */}
+            {canScrollLeft && (
+              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none" />
+            )}
+
+            {/* Left Indicator - Positioned better */}
             {canScrollLeft && (
               <button
                 onClick={() => scroll("left")}
-                className="absolute left-0 z-20 p-2 bg-white shadow-lg rounded-full border border-gray-100 text-gray-600 hover:text-blue-600 transition-all active:scale-95 animate-in fade-in slide-in-from-left-2 duration-300"
-                style={{ marginLeft: "4px" }}
+                className="absolute left-2 z-20 p-2.5 bg-white/90 backdrop-blur-md shadow-lg rounded-full border border-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white transition-all active:scale-90 animate-in fade-in slide-in-from-left-4 duration-500 flex items-center justify-center group/btn"
               >
-                <ChevronLeft size={20} />
+                <ChevronLeft
+                  size={18}
+                  className="group-hover/btn:-translate-x-0.5 transition-transform"
+                />
               </button>
             )}
 
             <div
               ref={scrollContainerRef}
               onScroll={checkScroll}
-              className="overflow-x-auto no-scrollbar py-1 w-full flex items-center"
+              className="overflow-x-auto no-scrollbar scroll-smooth w-full flex items-center py-2"
             >
-              <div
-                className={`flex items-center gap-2 md:gap-3 min-w-max transition-all duration-300 ${
-                  canScrollLeft || canScrollRight ? "px-14" : "px-2"
-                }`}
-              >
+              <div className="flex items-center gap-3 px-4 min-w-max">
                 {(categories.includes("All")
                   ? categories
                   : ["All", ...categories]
@@ -459,13 +463,21 @@ const POS: React.FC<POSProps> = ({
               </div>
             </div>
 
+            {/* Right Fade Overlay */}
+            {canScrollRight && (
+              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none" />
+            )}
+
+            {/* Right Indicator - Positioned better */}
             {canScrollRight && (
               <button
                 onClick={() => scroll("right")}
-                className="absolute right-0 z-20 p-2 bg-white shadow-lg rounded-full border border-gray-100 text-gray-600 hover:text-blue-600 transition-all active:scale-95 animate-in fade-in slide-in-from-right-2 duration-300"
-                style={{ marginRight: "4px" }}
+                className="absolute right-2 z-20 p-2.5 bg-white/90 backdrop-blur-md shadow-lg rounded-full border border-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white transition-all active:scale-90 animate-in fade-in slide-in-from-right-4 duration-500 flex items-center justify-center group/btn"
               >
-                <ChevronRight size={20} />
+                <ChevronRight
+                  size={18}
+                  className="group-hover/btn:translate-x-0.5 transition-transform"
+                />
               </button>
             )}
           </div>
