@@ -583,7 +583,7 @@ const POS: React.FC<POSProps> = ({
                       {item.price.toFixed(2)}
                     </p>
                   </div>
-                  <div className="flex items-center gap-1 lg:gap-1.5">
+                  <div className="flex items-center gap-0.5 lg:gap-1">
                     <div className="flex items-center bg-gray-50 rounded-full p-0.5 shadow-inner flex-shrink-0">
                       <button
                         onClick={() => updateQuantity(item.id, -1)}
