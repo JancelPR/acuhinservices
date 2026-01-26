@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
   ChevronDown,
-  MoreHorizontal,
+  MoreVertical,
   Edit2,
   Trash2,
   Check,
@@ -90,7 +90,7 @@ const UnitSelector: React.FC<UnitSelectorProps> = ({
         }`}
       >
         <span
-          className={`truncate text-[13px] font-semibold ${value ? "text-gray-900" : "text-gray-400"}`}
+          className={`truncate text-[13px] font-medium ${value ? "text-gray-900" : "text-gray-400"}`}
         >
           {value || "Select"}
         </span>
@@ -108,12 +108,12 @@ const UnitSelector: React.FC<UnitSelectorProps> = ({
             className="fixed inset-0 z-[1001]"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute top-[-2px] left-[-2px] right-[-2px] p-1 bg-white border border-orange-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[1002] animate-in fade-in zoom-in-95 duration-300 origin-top overflow-hidden">
+          <div className="absolute top-[-2px] left-[-2px] right-[-2px] p-1 bg-white border border-orange-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] z-[1002] animate-in fade-in zoom-in-95 duration-300 origin-top">
             <div className="max-h-[160px] overflow-y-auto no-scrollbar py-0.5">
               {units.map((unit) => (
                 <div
                   key={unit}
-                  className={`group flex items-center justify-between px-3 py-1.5 rounded-xl transition-all duration-200 cursor-pointer relative overflow-hidden ${
+                  className={`group flex items-center justify-between px-3 py-1.5 rounded-xl transition-all duration-200 cursor-pointer relative ${
                     value === unit
                       ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-200/50"
                       : "text-gray-600 hover:bg-orange-50/50 hover:text-orange-600"
@@ -134,7 +134,11 @@ const UnitSelector: React.FC<UnitSelectorProps> = ({
                         type="text"
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
-                        className="w-full text-[11px] font-bold px-2 py-1 bg-white/20 border border-white/30 rounded-lg text-white placeholder:text-white/50 outline-none focus:ring-2 focus:ring-white/50"
+                        className={`w-full text-[11px] font-medium px-2 py-1 rounded-lg outline-none transition-all ${
+                          value === unit
+                            ? "bg-white/20 text-white placeholder:text-white/50 focus:ring-2 focus:ring-white/50"
+                            : "bg-gray-50 text-gray-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-200"
+                        }`}
                         autoFocus
                         onKeyDown={(e) => {
                           if (e.key === "Enter") handleSaveEdit(unit);
@@ -143,7 +147,11 @@ const UnitSelector: React.FC<UnitSelectorProps> = ({
                       />
                       <button
                         onClick={() => handleSaveEdit(unit)}
-                        className="p-1 text-white hover:bg-white/20 rounded-lg transition-colors"
+                        className={`p-1 rounded-lg transition-colors ${
+                          value === unit
+                            ? "text-white hover:bg-white/20"
+                            : "text-orange-500 hover:bg-orange-50"
+                        }`}
                       >
                         <Check size={14} />
                       </button>
@@ -158,12 +166,43 @@ const UnitSelector: React.FC<UnitSelectorProps> = ({
                               : "bg-gray-200 group-hover:bg-orange-400 group-hover:scale-150"
                           }`}
                         />
-                        <span className="text-[11px] font-bold uppercase tracking-widest truncate">
+                        <span className="text-[11px] font-medium uppercase tracking-widest truncate">
                           {unit}
                         </span>
                       </div>
 
-                      <div className="relative">
+                      <div className="flex items-center">
+                        <div
+                          className={`flex items-center gap-1 transition-all duration-300 ${
+                            activeMenu === unit
+                              ? "opacity-100 translate-x-0"
+                              : "opacity-0 translate-x-4 pointer-events-none"
+                          }`}
+                        >
+                          <button
+                            onClick={(e) => handleEditClick(unit, e)}
+                            className={`p-1 rounded-lg transition-all ${
+                              value === unit
+                                ? "text-white/70 hover:text-white hover:bg-white/10"
+                                : "text-orange-400 hover:text-orange-600 hover:bg-orange-50"
+                            }`}
+                            title="Edit Unit"
+                          >
+                            <Edit2 size={13} strokeWidth={2.5} />
+                          </button>
+                          <button
+                            onClick={(e) => handleDeleteClick(unit, e)}
+                            className={`p-1 rounded-lg transition-all ${
+                              value === unit
+                                ? "text-white/70 hover:text-white hover:bg-white/10"
+                                : "text-red-400 hover:text-red-600 hover:bg-red-50"
+                            }`}
+                            title="Delete Unit"
+                          >
+                            <Trash2 size={13} strokeWidth={2.5} />
+                          </button>
+                        </div>
+
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -171,46 +210,12 @@ const UnitSelector: React.FC<UnitSelectorProps> = ({
                           }}
                           className={`p-1 rounded-lg transition-all ${
                             value === unit
-                              ? "text-white/70 hover:text-white hover:bg-white/10"
+                              ? "text-white/40 hover:text-white/70 hover:bg-white/10"
                               : "text-gray-300 hover:text-gray-600 hover:bg-gray-100"
                           }`}
                         >
-                          <MoreHorizontal size={14} />
+                          <MoreVertical size={14} strokeWidth={2.5} />
                         </button>
-
-                        {activeMenu === unit && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-[1003]"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveMenu(null);
-                              }}
-                            />
-                            <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 py-1 w-28 z-[1004] animate-in fade-in zoom-in-95 duration-200">
-                              <button
-                                onClick={(e) => handleEditClick(unit, e)}
-                                className="w-full text-left px-3 py-1.5 text-[10px] font-bold text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                              >
-                                <Edit2 size={12} className="text-orange-500" />{" "}
-                                Edit
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (confirm(`Delete unit "${unit}"?`)) {
-                                    onDeleteUnit(unit);
-                                    if (value === unit) onChange("pc");
-                                  }
-                                  setActiveMenu(null);
-                                }}
-                                className="w-full text-left px-3 py-1.5 text-[10px] font-bold text-red-500 hover:bg-red-50 flex items-center gap-2"
-                              >
-                                <Trash2 size={12} /> Delete
-                              </button>
-                            </div>
-                          </>
-                        )}
                       </div>
                     </>
                   )}
