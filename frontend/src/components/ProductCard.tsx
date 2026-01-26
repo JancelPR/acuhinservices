@@ -18,6 +18,8 @@ interface ProductCardProps {
   onAddToCart?: (product: Product) => void;
   onEdit?: (product: Product) => void;
   onDelete?: (id: string) => void;
+  isInCart?: boolean;
+  cartQuantity?: number;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -26,6 +28,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onAddToCart,
   onEdit,
   onDelete,
+  isInCart,
+  cartQuantity,
 }) => {
   const [showAdminMenu, setShowAdminMenu] = useState(false);
   const isAvailable = product.stock > 0;
@@ -33,13 +37,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <div
       onClick={() => !isAdmin && isAvailable && onAddToCart?.(product)}
-      className={`bg-gray-200/90 backdrop-blur-xl border border-gray-300/50 p-1 md:p-1.5 rounded-xl md:rounded-2xl shadow-sm hover:shadow-lg transition-all duration-500 group relative w-full font-roboto
+      className={`bg-gray-200/90 backdrop-blur-xl border p-1 md:p-1.5 rounded-xl md:rounded-2xl shadow-sm hover:shadow-lg transition-all duration-500 group relative w-full font-roboto
       ${!isAdmin && isAvailable ? "cursor-pointer" : ""}
       ${
         !isAvailable && !isAdmin
           ? "opacity-60 cursor-not-allowed grayscale"
           : ""
       }
+      ${isInCart ? "border-orange-200 shadow-[0_5px_15px_rgba(249,115,22,0.1)] bg-white/40" : "border-gray-300/50"}
       `}
     >
       <div className="relative mb-2 overflow-hidden rounded-[1.2rem] md:rounded-[1.5rem] aspect-square bg-gray-50">
@@ -164,9 +169,22 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
 
           {!isAdmin && isAvailable && (
-            <button className="w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl bg-gray-50 flex items-center justify-center text-gray-600 group-hover:bg-gradient-to-br group-hover:from-orange-500 group-hover:to-red-500 group-hover:text-white transition-all duration-300 shadow-sm">
-              <Plus className="w-4 h-4 md:w-4.5 md:h-4.5" />
-            </button>
+            <div className="relative">
+              <button
+                className={`w-7 h-7 md:w-8 md:h-8 rounded-lg md:rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm
+                ${
+                  isInCart
+                    ? "bg-orange-500 text-white font-bold text-[12px] md:text-[14px] font-google-sans"
+                    : "bg-gray-50 text-gray-600 hover:bg-gradient-to-br hover:from-orange-500 hover:to-red-500 hover:text-white"
+                }`}
+              >
+                {isInCart ? (
+                  cartQuantity
+                ) : (
+                  <Plus className="w-4 h-4 md:w-4.5 md:h-4.5" />
+                )}
+              </button>
+            </div>
           )}
 
           {isAdmin && (

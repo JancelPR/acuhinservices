@@ -173,3 +173,7 @@ input[type="number"] {
 .font-roboto {
   font-family: 'Roboto', sans-serif;
 }
+
+.font-google-sans {
+  font-family: 'Product Sans', 'Google Sans', sans-serif;
+}

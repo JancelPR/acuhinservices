@@ -496,14 +496,19 @@ const POS: React.FC<POSProps> = ({
             <div
               className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 ${isSidebarCollapsed ? "xl:grid-cols-5" : "xl:grid-cols-4"} 2xl:grid-cols-5 gap-3 md:gap-3`}
             >
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  isAdmin={false}
-                  onAddToCart={addToCart}
-                />
-              ))}
+              {filteredProducts.map((product) => {
+                const cartItem = cart.find((item) => item.id === product.id);
+                return (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    isAdmin={false}
+                    onAddToCart={addToCart}
+                    isInCart={!!cartItem}
+                    cartQuantity={cartItem?.quantity}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
