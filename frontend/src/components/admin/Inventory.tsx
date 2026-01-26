@@ -957,14 +957,29 @@ const Inventory: React.FC<InventoryProps> = ({
                       Category <span className="text-red-500">*</span>
                     </label>
                     {isAddingNewCategory ? (
-                      <div className="flex gap-2">
+                      <div className="relative group/category">
                         <input
                           type="text"
                           value={newCategoryName}
                           onChange={(e) => setNewCategoryName(e.target.value)}
                           placeholder="Category..."
-                          className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-500/20"
+                          className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-3 pr-10 py-2.5 text-sm outline-none focus:ring-2 focus:ring-orange-500/20 focus:bg-white focus:border-orange-200 transition-all shadow-inner"
                           autoFocus
+                          onKeyDown={async (e) => {
+                            if (e.key === "Enter" && newCategoryName.trim()) {
+                              await onAddCategory(newCategoryName.trim());
+                              setCurrentProduct({
+                                ...currentProduct,
+                                category:
+                                  newCategoryName.trim() as CategoryType,
+                              });
+                              setIsAddingNewCategory(false);
+                              setNewCategoryName("");
+                            }
+                            if (e.key === "Escape") {
+                              setIsAddingNewCategory(false);
+                            }
+                          }}
                         />
                         <button
                           type="button"
@@ -980,9 +995,9 @@ const Inventory: React.FC<InventoryProps> = ({
                               setNewCategoryName("");
                             }
                           }}
-                          className="p-2 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 flex items-center justify-center text-orange-600 hover:text-orange-700 active:scale-90 transition-all"
                         >
-                          <Check size={16} />
+                          <Check size={18} />
                         </button>
                       </div>
                     ) : (
@@ -1107,7 +1122,7 @@ const Inventory: React.FC<InventoryProps> = ({
                     </label>
                     <div className="relative">
                       {isCustomUnit ? (
-                        <div className="relative">
+                        <div className="relative group/unit">
                           <input
                             type="text"
                             value={currentProduct.unit || ""}
@@ -1118,20 +1133,24 @@ const Inventory: React.FC<InventoryProps> = ({
                               })
                             }
                             placeholder="Unit..."
-                            className="w-full bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#4285F4]/20"
+                            className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-3 pr-10 py-2.5 text-sm outline-none focus:ring-2 focus:ring-orange-500/20 focus:bg-white focus:border-orange-200 transition-all shadow-inner"
                             autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") setIsCustomUnit(false);
+                              if (e.key === "Escape") {
+                                setIsCustomUnit(false);
+                                setCurrentProduct({
+                                  ...currentProduct,
+                                  unit: "pc",
+                                });
+                              }
+                            }}
                           />
                           <button
-                            onClick={() => {
-                              setIsCustomUnit(false);
-                              setCurrentProduct({
-                                ...currentProduct,
-                                unit: "pc",
-                              });
-                            }}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-orange-600 font-bold hover:underline"
+                            onClick={() => setIsCustomUnit(false)}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 flex items-center justify-center text-orange-600 hover:text-orange-700 active:scale-90 transition-all"
                           >
-                            Reset
+                            <Check size={18} />
                           </button>
                         </div>
                       ) : (

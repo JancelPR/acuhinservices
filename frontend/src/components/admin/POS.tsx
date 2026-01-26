@@ -420,16 +420,11 @@ const POS: React.FC<POSProps> = ({
         <div className="flex flex-col gap-1">
           {/* Advanced Category Navigation */}
           <div className="relative flex items-center group/nav px-2 py-0.5">
-            {/* Left Fade Overlay */}
-            {canScrollLeft && (
-              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#F8FAFC] via-[#F8FAFC]/60 to-transparent z-10 pointer-events-none" />
-            )}
-
             {/* Left Indicator - Positioned better */}
             {canScrollLeft && (
               <button
                 onClick={() => scroll("left")}
-                className="absolute left-2 z-20 p-2.5 bg-white/95 backdrop-blur-md shadow-[0_4px_15px_rgba(0,0,0,0.05)] rounded-full border border-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white transition-all active:scale-90 animate-in fade-in slide-in-from-left-4 duration-500 flex items-center justify-center group/btn"
+                className="absolute left-2 z-20 p-2.5 bg-white shadow-[0_4px_15px_rgba(0,0,0,0.06)] rounded-full border border-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white transition-all active:scale-90 animate-in fade-in slide-in-from-left-4 duration-500 flex items-center justify-center group/btn"
               >
                 <ChevronLeft
                   size={18}
@@ -463,16 +458,11 @@ const POS: React.FC<POSProps> = ({
               </div>
             </div>
 
-            {/* Right Fade Overlay */}
-            {canScrollRight && (
-              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#F8FAFC] via-[#F8FAFC]/60 to-transparent z-10 pointer-events-none" />
-            )}
-
             {/* Right Indicator - Positioned better */}
             {canScrollRight && (
               <button
                 onClick={() => scroll("right")}
-                className="absolute right-2 z-20 p-2.5 bg-white/95 backdrop-blur-md shadow-[0_4px_15px_rgba(0,0,0,0.05)] rounded-full border border-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white transition-all active:scale-90 animate-in fade-in slide-in-from-right-4 duration-500 flex items-center justify-center group/btn"
+                className="absolute right-2 z-20 p-2.5 bg-white shadow-[0_4px_15px_rgba(0,0,0,0.06)] rounded-full border border-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white transition-all active:scale-90 animate-in fade-in slide-in-from-right-4 duration-500 flex items-center justify-center group/btn"
               >
                 <ChevronRight
                   size={18}
