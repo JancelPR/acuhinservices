@@ -584,10 +584,10 @@ const POS: React.FC<POSProps> = ({
                     </p>
                   </div>
                   <div className="flex items-center gap-1 lg:gap-1.5">
-                    <div className="flex items-center bg-gray-50 rounded-full p-0.5 shadow-inner">
+                    <div className="flex items-center bg-gray-50 rounded-full p-0.5 shadow-inner flex-shrink-0">
                       <button
                         onClick={() => updateQuantity(item.id, -1)}
-                        className="w-6 h-6 flex items-center justify-center text-gray-500 hover:bg-white hover:shadow-sm rounded-full transition-all"
+                        className="w-5 h-5 flex items-center justify-center text-gray-500 hover:bg-white hover:shadow-sm rounded-full transition-all"
                       >
                         <Minus size={10} />
                       </button>
@@ -595,13 +595,13 @@ const POS: React.FC<POSProps> = ({
                         type="number"
                         value={item.quantity}
                         onChange={(e) => setQuantity(item.id, e.target.value)}
-                        className="text-[12px] font-normal w-9 text-center bg-white rounded-md border-none focus:outline-none focus:ring-0 p-0 no-spinners shadow-sm"
+                        className="text-[11px] font-normal w-7 text-center bg-white rounded-md border-none focus:outline-none focus:ring-0 p-0 no-spinners shadow-sm"
                       />
                       <button
                         onClick={() => addToCart(item)}
-                        className="w-6 h-6 flex items-center justify-center bg-orange-50 text-orange-400 hover:bg-orange-100 rounded-full transition-all shadow-sm"
+                        className="w-5 h-5 flex items-center justify-center bg-orange-50 text-orange-400 hover:bg-orange-100 rounded-full transition-all shadow-sm"
                       >
-                        <Plus size={12} />
+                        <Plus size={10} />
                       </button>
                     </div>
                     <button
