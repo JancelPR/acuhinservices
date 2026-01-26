@@ -90,7 +90,7 @@ const UnitSelector: React.FC<UnitSelectorProps> = ({
         }`}
       >
         <span
-          className={`truncate text-[13px] font-medium ${value ? "text-gray-900" : "text-gray-400"}`}
+          className={`truncate text-[13px] font-normal ${value ? "text-gray-900" : "text-gray-400"}`}
         >
           {value || "Select"}
         </span>
@@ -134,7 +134,7 @@ const UnitSelector: React.FC<UnitSelectorProps> = ({
                         type="text"
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
-                        className={`w-full text-[11px] font-medium px-2 py-1 rounded-lg outline-none transition-all ${
+                        className={`w-full text-[11px] font-normal px-2 py-1 rounded-lg outline-none transition-all ${
                           value === unit
                             ? "bg-white/20 text-white placeholder:text-white/50 focus:ring-2 focus:ring-white/50"
                             : "bg-gray-50 text-gray-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-200"
@@ -166,7 +166,7 @@ const UnitSelector: React.FC<UnitSelectorProps> = ({
                               : "bg-gray-200 group-hover:bg-orange-400 group-hover:scale-150"
                           }`}
                         />
-                        <span className="text-[11px] font-medium uppercase tracking-widest truncate">
+                        <span className="text-[11px] font-normal uppercase tracking-widest truncate">
                           {unit}
                         </span>
                       </div>

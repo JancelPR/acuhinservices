@@ -17,6 +17,8 @@ import {
   Barcode,
   Filter,
   ChevronDown,
+  Link,
+  Clipboard,
 } from "lucide-react";
 import { api } from "../../services/api";
 import {
@@ -67,6 +69,9 @@ const Inventory: React.FC<InventoryProps> = ({
   const [isStockAlertFocused, setIsStockAlertFocused] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [isModalCategoryOpen, setIsModalCategoryOpen] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
+  const [isUrlFocused, setIsUrlFocused] = useState(false);
 
   // Confirmation Modal State
   const [confirmModal, setConfirmModal] = useState<{
@@ -190,7 +195,11 @@ const Inventory: React.FC<InventoryProps> = ({
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    handleFile(file);
+  };
+
+  const handleFile = (file: File | undefined) => {
+    if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setCurrentProduct((prev) => ({
@@ -199,6 +208,73 @@ const Inventory: React.FC<InventoryProps> = ({
         }));
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+          const file = items[i].getAsFile();
+          if (file) handleFile(file);
+          break;
+        }
+      }
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    handleFile(file);
+  };
+
+  const handleUrlSubmit = () => {
+    if (imageUrl.trim()) {
+      setCurrentProduct((prev) => ({
+        ...prev,
+        image: imageUrl.trim(),
+      }));
+      setImageUrl("");
+    }
+  };
+
+  const handleClipboardClick = async () => {
+    try {
+      const clipboardItems = await navigator.clipboard.read();
+      for (const item of clipboardItems) {
+        for (const type of item.types) {
+          if (type.startsWith("image/")) {
+            const blob = await item.getType(type);
+            const file = new File([blob], "pasted-image.png", { type });
+            handleFile(file);
+            return;
+          }
+        }
+      }
+      alert("No image found in clipboard. Please copy an image first!");
+    } catch (err) {
+      console.error("Failed to read clipboard:", err);
+      alert(
+        "Please press Ctrl+V to paste, or allow clipboard access in your browser.",
+      );
     }
   };
 
@@ -682,17 +758,69 @@ const Inventory: React.FC<InventoryProps> = ({
             {/* Modal Content */}
             <div className="p-6 overflow-visible space-y-5">
               {/* Image Section - More compact at top */}
-              <div className="flex gap-4 items-center">
+              <div className="flex gap-4 items-start">
                 <div className="relative group">
-                  <div className="w-24 h-24 rounded-2xl bg-gray-50 border border-gray-200 overflow-hidden flex items-center justify-center shadow-inner">
+                  <div
+                    className={`w-24 h-24 rounded-2xl bg-gray-50 border overflow-hidden flex items-center justify-center shadow-inner transition-all duration-200 ${
+                      isDragging
+                        ? "border-orange-300 ring-4 ring-orange-500/10 scale-105"
+                        : "border-gray-200"
+                    }`}
+                    onDragOver={handleDragOver}
+                    onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onPaste={handlePaste}
+                  >
                     {currentProduct.image ? (
-                      <img
-                        src={currentProduct.image}
-                        alt="Preview"
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
+                      <div className="relative w-full h-full">
+                        <img
+                          src={currentProduct.image}
+                          alt="Preview"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentProduct((prev) => ({
+                              ...prev,
+                              image: "",
+                            }));
+                          }}
+                          className="absolute top-0.5 right-0.5 w-6 h-6 text-red-500 rounded-full flex items-center justify-center transition-all hover:scale-125 z-20 drop-shadow-sm"
+                          title="Remove Image"
+                        >
+                          <X size={16} strokeWidth={3} />
+                        </button>
+                        {isDragging && (
+                          <div className="absolute inset-0 bg-orange-500/20 backdrop-blur-[2px] flex flex-col items-center justify-center border-2 border-orange-500 border-dashed rounded-2xl">
+                            <Upload
+                              className="text-orange-600 animate-bounce"
+                              size={24}
+                            />
+                            <span className="text-[8px] font-bold text-orange-600 uppercase">
+                              Drop
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     ) : (
-                      <ImageIcon size={32} className="text-gray-200" />
+                      <div className="flex flex-col items-center justify-center gap-1.5 opacity-40 group-hover:opacity-60 transition-opacity">
+                        <div className="relative">
+                          <Upload
+                            size={28}
+                            className={`transition-all duration-300 ${isDragging ? "text-orange-500 scale-110" : "text-gray-300"}`}
+                          />
+                          {isDragging && (
+                            <div className="absolute -inset-1 border-2 border-orange-500 border-dashed rounded-full animate-[spin_4s_linear_infinite]" />
+                          )}
+                        </div>
+                        <span
+                          className={`text-[8px] font-bold uppercase tracking-wider transition-colors ${isDragging ? "text-orange-600" : "text-gray-400"}`}
+                        >
+                          {isDragging ? "Drop Now" : "Drag & Drop"}
+                        </span>
+                      </div>
                     )}
                   </div>
                   {isGeneratingImage && (
@@ -706,25 +834,77 @@ const Inventory: React.FC<InventoryProps> = ({
                 </div>
 
                 <div className="flex-1 space-y-2">
-                  <label className="cursor-pointer flex items-center gap-2 w-full px-3 py-2 border border-gray-100 rounded-xl text-[11px] font-bold text-gray-600 bg-gray-50/50 hover:bg-white hover:border-orange-200 hover:text-orange-600 transition-all shadow-sm">
-                    <Upload size={14} />
-                    <span>Upload Photo</span>
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                    />
-                  </label>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <label className="cursor-pointer flex flex-col items-center justify-center gap-1 px-1 py-1.5 border border-gray-100 rounded-xl text-[8px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50 hover:bg-white hover:border-orange-200 hover:text-orange-600 transition-all shadow-sm group">
+                      <Upload
+                        size={12}
+                        className="group-hover:scale-110 transition-transform"
+                      />
+                      <span className="truncate">UPLOAD</span>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                      />
+                    </label>
+
+                    <button
+                      onClick={handleClipboardClick}
+                      className="flex flex-col items-center justify-center gap-1 px-1 py-1.5 border border-gray-100 rounded-xl text-[8px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50 hover:bg-white hover:border-orange-200 hover:text-orange-600 transition-all shadow-sm group"
+                    >
+                      <Clipboard
+                        size={12}
+                        className="group-hover:scale-110 transition-transform"
+                      />
+                      <span>PASTE</span>
+                    </button>
+
+                    <div className="relative flex flex-col items-center justify-center gap-1 px-1 py-1.5 border border-gray-100 rounded-xl bg-gray-50/50 focus-within:bg-white focus-within:border-orange-200 transition-all shadow-sm group min-h-[44px]">
+                      {/* Visual Placeholder */}
+                      <div
+                        className={`flex flex-col items-center transition-all duration-200 pointer-events-none ${imageUrl || isUrlFocused ? "opacity-0 scale-95" : "opacity-100"}`}
+                      >
+                        <Link size={12} className="text-gray-400" />
+                        <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">
+                          URL
+                        </span>
+                      </div>
+
+                      <input
+                        type="text"
+                        value={imageUrl}
+                        onFocus={() => setIsUrlFocused(true)}
+                        onBlur={() => {
+                          setIsUrlFocused(false);
+                          handleUrlSubmit();
+                        }}
+                        onChange={(e) => setImageUrl(e.target.value)}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && handleUrlSubmit()
+                        }
+                        className="absolute inset-0 w-full h-full text-center bg-transparent border-0 outline-none px-2 text-[10px] font-medium text-gray-900"
+                      />
+                    </div>
+                  </div>
 
                   <button
                     onClick={handleGenerateImage}
                     disabled={isGeneratingImage || !currentProduct.name}
-                    className="w-full px-3 py-2 border border-orange-100 rounded-xl text-[11px] font-bold text-orange-600 bg-orange-50/30 hover:bg-white hover:border-orange-300 transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+                    className="w-full px-3 py-1.5 border border-orange-100 rounded-xl text-[10px] font-bold text-orange-600 bg-orange-50/30 hover:bg-white hover:border-orange-300 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm group"
                   >
-                    <Wand2 size={14} />
-                    <span>AI Generate Product Image</span>
+                    <Wand2
+                      size={14}
+                      className="group-hover:rotate-12 transition-transform"
+                    />
+                    <span>AI GENERATE</span>
                   </button>
+
+                  <div className="flex items-center justify-center gap-1 py-0.5 opacity-40">
+                    <span className="text-[10px] font-normal uppercase tracking-widest text-center">
+                      Tip: Ctrl+V or Drag & Drop also works
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -894,20 +1074,17 @@ const Inventory: React.FC<InventoryProps> = ({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
+                    <label className="block text-[10px] font-normal text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
                       Price Details <span className="text-red-500">*</span>
                     </label>
                     <div className="relative group">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-semibold">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-normal">
                         {CURRENCY}
                       </span>
                       <input
                         type="number"
-                        value={
-                          isPriceFocused && currentProduct.price === 0
-                            ? ""
-                            : currentProduct.price || 0
-                        }
+                        value={currentProduct.price || ""}
+                        placeholder="Amount"
                         onChange={(e) => {
                           const val =
                             e.target.value === "" ? 0 : Number(e.target.value);
@@ -920,7 +1097,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             setCurrentProduct({ ...currentProduct, price: 0 });
                           }
                         }}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-6 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-500/20 text-gray-900 transition-all focus:bg-white"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-6 pr-3 py-2 text-[13px] font-normal outline-none focus:ring-2 focus:ring-orange-500/20 text-gray-900 transition-all focus:bg-white"
                       />
                     </div>
                   </div>
@@ -985,21 +1162,20 @@ const Inventory: React.FC<InventoryProps> = ({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1 truncate">
+                    <label className="block text-[10px] font-normal text-gray-400 uppercase tracking-wider mb-1.5 ml-1 truncate">
                       Stock Alert
                     </label>
                     <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-400">
+                      <div
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-400 group-hover:text-orange-500 transition-colors z-10 cursor-help"
+                        title="Notifies when stock level falls below this value"
+                      >
                         <AlertCircle size={16} />
                       </div>
                       <input
                         type="number"
-                        value={
-                          isStockAlertFocused &&
-                          currentProduct.lowStockThreshold === 0
-                            ? ""
-                            : currentProduct.lowStockThreshold || 0
-                        }
+                        value={currentProduct.lowStockThreshold || ""}
+                        placeholder="Threshold"
                         onChange={(e) => {
                           const val =
                             e.target.value === "" ? 0 : Number(e.target.value);
@@ -1018,23 +1194,19 @@ const Inventory: React.FC<InventoryProps> = ({
                             });
                           }
                         }}
-                        placeholder="Threshold"
-                        className="w-full bg-gray-50 border-0 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-sm transition-all border border-gray-100"
+                        className="w-full bg-gray-50 border-0 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-[13px] transition-all border border-gray-100"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
+                    <label className="block text-[10px] font-normal text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
                       Stock Quantity <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
                       max="9999"
-                      value={
-                        isStockFocused && currentProduct.stock === 0
-                          ? ""
-                          : currentProduct.stock || 0
-                      }
+                      value={currentProduct.stock || ""}
+                      placeholder="Quantity"
                       onChange={(e) => {
                         const val =
                           e.target.value === "" ? 0 : Number(e.target.value);
@@ -1050,7 +1222,7 @@ const Inventory: React.FC<InventoryProps> = ({
                           setCurrentProduct({ ...currentProduct, stock: 0 });
                         }
                       }}
-                      className="w-full bg-gray-50 border-0 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-sm transition-all border border-gray-100"
+                      className="w-full bg-gray-50 border-0 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-[13px] transition-all border border-gray-100"
                     />
                   </div>
                 </div>

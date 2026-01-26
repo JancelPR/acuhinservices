@@ -560,7 +560,7 @@ const POS: React.FC<POSProps> = ({
               <div className="relative">
                 <ShoppingCart size={22} className="text-orange-500" />
                 {cart.length > 0 && (
-                  <span className="absolute -top-2.5 -right-2.5 text-red-500 text-[11px] font-black animate-in fade-in duration-300">
+                  <span className="absolute -top-3.5 -right-2 text-red-500 text-[11px] font-black animate-in fade-in duration-300">
                     {cart.length}
                   </span>
                 )}
