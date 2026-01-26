@@ -378,11 +378,11 @@ const POS: React.FC<POSProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 overflow-hidden">
+    <div className="flex flex-col h-full bg-transparent overflow-hidden">
       {/* Unified POS Header with Pill Categories Stacking */}
       <div className="bg-transparent px-4 pt-0 pb-1.5 flex flex-col gap-1.5 flex-shrink-0">
         {/* Terminal Header */}
-        <div className="flex items-center justify-between py-3 px-6 bg-white/60 backdrop-blur-xl rounded-[2rem] shadow-[0_15px_35px_-5px_rgba(249,115,22,0.12),0_5px_15px_-3px_rgba(0,0,0,0.04)] relative overflow-hidden group border-none">
+        <div className="flex items-center justify-between py-3 px-6 bg-white/70 backdrop-blur-xl rounded-[2rem] shadow-[0_10px_35px_-10px_rgba(249,115,22,0.18)] border border-orange-100/30 relative overflow-hidden group">
           {/* Subtle Inner Glow */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
@@ -422,14 +422,14 @@ const POS: React.FC<POSProps> = ({
           <div className="relative flex items-center group/nav px-2 py-0.5">
             {/* Left Fade Overlay */}
             {canScrollLeft && (
-              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none" />
+              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#F8FAFC] via-[#F8FAFC]/60 to-transparent z-10 pointer-events-none" />
             )}
 
             {/* Left Indicator - Positioned better */}
             {canScrollLeft && (
               <button
                 onClick={() => scroll("left")}
-                className="absolute left-2 z-20 p-2.5 bg-white/90 backdrop-blur-md shadow-lg rounded-full border border-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white transition-all active:scale-90 animate-in fade-in slide-in-from-left-4 duration-500 flex items-center justify-center group/btn"
+                className="absolute left-2 z-20 p-2.5 bg-white/95 backdrop-blur-md shadow-[0_4px_15px_rgba(0,0,0,0.05)] rounded-full border border-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white transition-all active:scale-90 animate-in fade-in slide-in-from-left-4 duration-500 flex items-center justify-center group/btn"
               >
                 <ChevronLeft
                   size={18}
@@ -465,14 +465,14 @@ const POS: React.FC<POSProps> = ({
 
             {/* Right Fade Overlay */}
             {canScrollRight && (
-              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#F8FAFC] via-[#F8FAFC]/60 to-transparent z-10 pointer-events-none" />
             )}
 
             {/* Right Indicator - Positioned better */}
             {canScrollRight && (
               <button
                 onClick={() => scroll("right")}
-                className="absolute right-2 z-20 p-2.5 bg-white/90 backdrop-blur-md shadow-lg rounded-full border border-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white transition-all active:scale-90 animate-in fade-in slide-in-from-right-4 duration-500 flex items-center justify-center group/btn"
+                className="absolute right-2 z-20 p-2.5 bg-white/95 backdrop-blur-md shadow-[0_4px_15px_rgba(0,0,0,0.05)] rounded-full border border-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white transition-all active:scale-90 animate-in fade-in slide-in-from-right-4 duration-500 flex items-center justify-center group/btn"
               >
                 <ChevronRight
                   size={18}
