@@ -158,7 +158,7 @@ const UnitSelector: React.FC<UnitSelectorProps> = ({
                     </div>
                   ) : (
                     <>
-                      <div className="flex items-center gap-2.5 truncate">
+                      <div className="flex items-center gap-2.5">
                         <div
                           className={`w-1.5 h-1.5 rounded-full transition-transform duration-500 ${
                             value === unit
