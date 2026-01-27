@@ -10,6 +10,8 @@ export interface Product {
   unit?: string;
   lowStockThreshold?: number;
   barcode?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type CategoryType = string;

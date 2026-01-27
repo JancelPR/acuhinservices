@@ -19,6 +19,9 @@ import {
   ChevronDown,
   Link,
   Clipboard,
+  ArrowUpDown,
+  SortAsc,
+  SortDesc,
 } from "lucide-react";
 import { api } from "../../services/api";
 import {
@@ -73,6 +76,13 @@ const Inventory: React.FC<InventoryProps> = ({
   const [imageUrl, setImageUrl] = useState("");
   const [isUrlFocused, setIsUrlFocused] = useState(false);
 
+  // Sorting State
+  const [sortBy, setSortBy] = useState<"name" | "price" | "stock" | "recent">(
+    "recent",
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
+
   // Confirmation Modal State
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -92,35 +102,36 @@ const Inventory: React.FC<InventoryProps> = ({
 
   // Computed Values
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      // Inventory doesn't rely on global activeCategory for filtering?
-      // In AdminPanel it used activeCategory which was shared with Sidebar.
-      // If we want to filter by category in Inventory view, we should probably ignore the global category
-      // OR pass it in. The UI in AdminPanel (lines 715+) shows a Search input and Stock Filters,
-      // but NOT a category selector specifically for the list,
-      // EXCEPT that AdminPanel uses `activeCategory` in `filteredProducts`.
-      // The Sidebar sets `activeCategory`.
-      // But wait, the Sidebar is persistent. If I click "Inventory", does the Sidebar category filter apply?
-      // Yes, line 79 of AdminPanel: `activeCategory === 'All' || product.category === activeCategory`.
-      // So I DO need activeCategory prop if I want to maintain that behavior.
-      // However, the Sidebar usually filters the main view.
-      // I'll add `activeCategory` to props to maintain behavior.
-      const matchesCategory =
-        activeCategory === "All" || product.category === activeCategory;
-      const matchesSearch =
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (product.barcode &&
-          product.barcode.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchesStock =
-        stockFilter === "all" ||
-        (stockFilter === "inStock" && product.stock > 0) ||
-        (stockFilter === "outOfStock" && product.stock === 0);
-      return matchesCategory && matchesSearch && matchesStock;
-    });
-  }, [products, searchQuery, stockFilter, activeCategory]);
-
-  // Wait, I missed the category filtering.
-  // I should add activeCategory prop.
+    return products
+      .filter((product) => {
+        const matchesCategory =
+          activeCategory === "All" || product.category === activeCategory;
+        const matchesSearch =
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (product.barcode &&
+            product.barcode.toLowerCase().includes(searchQuery.toLowerCase()));
+        const matchesStock =
+          stockFilter === "all" ||
+          (stockFilter === "inStock" && product.stock > 0) ||
+          (stockFilter === "outOfStock" && product.stock === 0);
+        return matchesCategory && matchesSearch && matchesStock;
+      })
+      .sort((a, b) => {
+        let comparison = 0;
+        if (sortBy === "name") {
+          comparison = a.name.localeCompare(b.name);
+        } else if (sortBy === "price") {
+          comparison = a.price - b.price;
+        } else if (sortBy === "stock") {
+          comparison = a.stock - b.stock;
+        } else if (sortBy === "recent") {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          comparison = dateA - dateB;
+        }
+        return sortOrder === "asc" ? comparison : -comparison;
+      });
+  }, [products, searchQuery, stockFilter, activeCategory, sortBy, sortOrder]);
 
   const stats = useMemo(
     () => ({
@@ -521,11 +532,11 @@ const Inventory: React.FC<InventoryProps> = ({
   };
 
   return (
-    <div className="flex-1 overflow-hidden flex flex-col">
+    <div className="flex-1 overflow-hidden flex flex-col bg-gray-50 rounded-t-[2.5rem]">
       {/* Sticky Header Section */}
       {/* Terminal Style Header for Inventory */}
       <div className="bg-transparent px-4 pt-0 pb-2 flex flex-col gap-2 flex-shrink-0">
-        <div className="flex items-center justify-between py-3 px-6 bg-white/60 backdrop-blur-xl rounded-[2rem] shadow-[0_15px_35px_-5px_rgba(249,115,22,0.12),0_5px_15px_-3px_rgba(0,0,0,0.04)] relative overflow-hidden group border-none">
+        <div className="flex items-center justify-between py-3 px-6 bg-white/70 backdrop-blur-xl rounded-full shadow-[0_15px_35px_-5px_rgba(249,115,22,0.12),0_5px_15px_-3px_rgba(0,0,0,0.04)] relative border border-white/40 group overflow-hidden">
           {/* Subtle Inner Glow */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
@@ -572,27 +583,26 @@ const Inventory: React.FC<InventoryProps> = ({
 
           <div className="flex flex-wrap gap-2 items-center w-full md:w-auto">
             {/* Premium Category Filter Dropdown */}
-            <div className="relative w-full md:w-auto min-w-[160px] z-[100]">
-              <button
-                onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
-                className={`w-full flex items-center justify-between pl-3 pr-2 py-1.5 bg-white/80 backdrop-blur-md border rounded-xl text-xs font-bold transition-all duration-300 shadow-sm hover:shadow-md group ${
-                  isCategoryMenuOpen
-                    ? "border-orange-200 ring-4 ring-orange-500/5 shadow-inner"
-                    : "border-gray-100 hover:border-orange-100"
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <div
-                    className={`p-1 rounded-lg transition-colors ${
-                      activeCategory === "All"
-                        ? "bg-gray-50 text-gray-400"
-                        : "bg-orange-50 text-orange-500"
+            <div className="flex items-center gap-1.5 bg-white/60 backdrop-blur-md border border-white/40 rounded-xl p-1 shadow-sm hover:shadow-md transition-all relative z-[100]">
+              <div className="relative">
+                <button
+                  onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-300 group/category ${
+                    isCategoryMenuOpen
+                      ? "bg-orange-50/80 shadow-inner"
+                      : "hover:bg-orange-50/50"
+                  }`}
+                >
+                  <Filter
+                    size={14}
+                    className={`transition-colors ${
+                      isCategoryMenuOpen || activeCategory !== "All"
+                        ? "text-orange-600"
+                        : "text-orange-400"
                     }`}
-                  >
-                    <Filter size={12} />
-                  </div>
+                  />
                   <span
-                    className={`truncate ${
+                    className={`text-[10px] font-black uppercase tracking-wider truncate max-w-[80px] ${
                       activeCategory === "All"
                         ? "text-gray-500"
                         : "text-gray-900"
@@ -600,57 +610,146 @@ const Inventory: React.FC<InventoryProps> = ({
                   >
                     {activeCategory}
                   </span>
-                </div>
-                <ChevronDown
-                  size={14}
-                  className={`text-gray-400 transition-transform duration-500 ${
-                    isCategoryMenuOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {/* Animated Floating Menu */}
-              {isCategoryMenuOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-10"
-                    onClick={() => setIsCategoryMenuOpen(false)}
+                  <ChevronDown
+                    size={12}
+                    className={`text-gray-400 transition-transform duration-500 ${
+                      isCategoryMenuOpen ? "rotate-180" : ""
+                    }`}
                   />
-                  <div className="absolute top-full left-0 right-0 mt-1.5 p-1 bg-white/90 backdrop-blur-xl border border-white/50 rounded-2xl shadow-[0_15px_40px_-12px_rgba(0,0,0,0.15)] z-20 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-300 origin-top overflow-hidden">
-                    <div className="max-h-[200px] overflow-y-auto no-scrollbar py-1">
-                      {sortedCategories.map((cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => {
-                            setActiveCategory(cat);
-                            setIsCategoryMenuOpen(false);
-                          }}
-                          className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all duration-200 group/item relative overflow-hidden ${
-                            activeCategory === cat
-                              ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-200"
-                              : "text-gray-600 hover:bg-orange-50/50 hover:text-orange-600"
-                          }`}
-                        >
-                          <div
-                            className={`w-1.5 h-1.5 rounded-full transition-transform duration-500 group-hover/item:scale-150 ${
-                              activeCategory === cat
-                                ? "bg-white"
-                                : "bg-gray-200 group-hover/item:bg-orange-400"
-                            }`}
-                          />
-                          <span className="relative z-10 truncate whitespace-nowrap">
-                            {cat}
-                          </span>
+                </button>
 
-                          {activeCategory === cat && (
-                            <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20 blur-sm" />
-                          )}
-                        </button>
-                      ))}
+                {/* Animated Floating Menu */}
+                {isCategoryMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsCategoryMenuOpen(false)}
+                    />
+                    <div className="absolute top-full left-0 mt-1.5 p-1 bg-white/95 backdrop-blur-xl border border-white/50 rounded-2xl shadow-[0_15px_40px_-12px_rgba(0,0,0,0.15)] z-20 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-300 origin-top overflow-hidden min-w-[140px]">
+                      <div className="max-h-[200px] overflow-y-auto no-scrollbar py-1">
+                        {sortedCategories.map((cat) => (
+                          <button
+                            key={cat}
+                            onClick={() => {
+                              setActiveCategory(cat);
+                              setIsCategoryMenuOpen(false);
+                            }}
+                            className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 group/item relative overflow-hidden ${
+                              activeCategory === cat
+                                ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-200"
+                                : "text-gray-600 hover:bg-orange-50/50 hover:text-orange-600"
+                            }`}
+                          >
+                            <div
+                              className={`w-1.5 h-1.5 rounded-full transition-transform duration-500 group-hover/item:scale-150 ${
+                                activeCategory === cat
+                                  ? "bg-white"
+                                  : "bg-gray-200 group-hover/item:bg-orange-400"
+                              }`}
+                            />
+                            <span className="relative z-10 truncate whitespace-nowrap">
+                              {cat}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
+              </div>
+
+              <div className="h-4 w-px bg-gray-200/50" />
+
+              {/* Modern Sort Controls */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsSortMenuOpen(!isSortMenuOpen)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-300 group/sort ${
+                    isSortMenuOpen
+                      ? "bg-orange-50/80 shadow-inner"
+                      : "hover:bg-orange-50/50"
+                  }`}
+                >
+                  <ArrowUpDown
+                    size={14}
+                    className={`transition-colors ${
+                      isSortMenuOpen ? "text-orange-600" : "text-orange-400"
+                    }`}
+                  />
+                  <span className="text-[10px] font-black text-gray-700 uppercase tracking-wider">
+                    {sortBy}
+                  </span>
+                  <ChevronDown
+                    size={12}
+                    className={`text-gray-400 transition-transform duration-500 ${
+                      isSortMenuOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {/* Glass Sort Menu */}
+                {isSortMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsSortMenuOpen(false)}
+                    />
+                    <div className="absolute top-full right-0 mt-1.5 min-w-[120px] p-1 bg-white/95 backdrop-blur-xl border border-white/50 rounded-2xl shadow-[0_15px_35px_-10px_rgba(0,0,0,0.15)] z-[100] animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-300 origin-top">
+                      <div className="py-0.5">
+                        {[
+                          { id: "recent", label: "Recent" },
+                          { id: "name", label: "Name" },
+                          { id: "price", label: "Price" },
+                          { id: "stock", label: "Stock" },
+                        ].map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => {
+                              setSortBy(option.id as any);
+                              setIsSortMenuOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 group/opt ${
+                              sortBy === option.id
+                                ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-md shadow-orange-200"
+                                : "text-gray-500 hover:bg-orange-50/50 hover:text-orange-600"
+                            }`}
+                          >
+                            <span>{option.label}</span>
+                            {sortBy === option.id && (
+                              <div className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <div className="h-4 w-px bg-gray-200/50" />
+
+              <button
+                onClick={() =>
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                }
+                className={`p-1.5 rounded-lg transition-all duration-300 group/order relative overflow-hidden ${
+                  sortOrder === "asc"
+                    ? "text-orange-500 hover:bg-orange-50"
+                    : "text-red-500 hover:bg-red-50"
+                }`}
+                title={
+                  sortOrder === "asc" ? "Sort Descending" : "Sort Ascending"
+                }
+              >
+                <div className="relative z-10 transform group-hover/order:scale-110 active:scale-90 transition-transform">
+                  {sortOrder === "asc" ? (
+                    <SortAsc size={16} />
+                  ) : (
+                    <SortDesc size={16} />
+                  )}
+                </div>
+                <div className="absolute inset-0 bg-current opacity-0 group-hover/order:opacity-[0.03] transition-opacity" />
+              </button>
             </div>
 
             <button
@@ -860,7 +959,7 @@ const Inventory: React.FC<InventoryProps> = ({
                       <span>PASTE</span>
                     </button>
 
-                    <div className="relative flex flex-col items-center justify-center gap-1 px-1 py-1.5 border border-gray-100 rounded-xl bg-gray-50/50 focus-within:bg-white focus-within:border-orange-200 transition-all shadow-sm group min-h-[44px]">
+                    <div className="relative flex flex-col items-center justify-center gap-1 px-1 py-1.5 border border-gray-100 rounded-xl bg-gray-50/50 focus-within:bg-white focus-within:border-orange-400 focus-within:ring-4 focus-within:ring-orange-500/10 transition-all duration-300 shadow-sm group min-h-[44px]">
                       {/* Visual Placeholder */}
                       <div
                         className={`flex flex-col items-center transition-all duration-200 pointer-events-none ${imageUrl || isUrlFocused ? "opacity-0 scale-95" : "opacity-100"}`}
@@ -923,7 +1022,7 @@ const Inventory: React.FC<InventoryProps> = ({
                         name: e.target.value,
                       })
                     }
-                    className="w-full bg-gray-50 border-0 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-sm transition-all border border-gray-100"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-sm transition-all duration-300 shadow-sm"
                     placeholder="e.g. SkyFlakes"
                   />
                 </div>
@@ -946,7 +1045,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             barcode: e.target.value,
                           })
                         }
-                        className="w-full bg-gray-50 border-0 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-sm transition-all border border-gray-100 placeholder:text-[11px]"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-10 pr-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-sm transition-all duration-300 shadow-sm placeholder:text-[11px]"
                         placeholder="Scan or enter barcode"
                       />
                     </div>
@@ -957,29 +1056,14 @@ const Inventory: React.FC<InventoryProps> = ({
                       Category <span className="text-red-500">*</span>
                     </label>
                     {isAddingNewCategory ? (
-                      <div className="relative group/category">
+                      <div className="flex gap-2">
                         <input
                           type="text"
                           value={newCategoryName}
                           onChange={(e) => setNewCategoryName(e.target.value)}
                           placeholder="Category..."
-                          className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-3 pr-10 py-2.5 text-sm outline-none focus:ring-2 focus:ring-orange-500/20 focus:bg-white focus:border-orange-200 transition-all shadow-inner"
+                          className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-sm"
                           autoFocus
-                          onKeyDown={async (e) => {
-                            if (e.key === "Enter" && newCategoryName.trim()) {
-                              await onAddCategory(newCategoryName.trim());
-                              setCurrentProduct({
-                                ...currentProduct,
-                                category:
-                                  newCategoryName.trim() as CategoryType,
-                              });
-                              setIsAddingNewCategory(false);
-                              setNewCategoryName("");
-                            }
-                            if (e.key === "Escape") {
-                              setIsAddingNewCategory(false);
-                            }
-                          }}
                         />
                         <button
                           type="button"
@@ -995,9 +1079,9 @@ const Inventory: React.FC<InventoryProps> = ({
                               setNewCategoryName("");
                             }
                           }}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 flex items-center justify-center text-orange-600 hover:text-orange-700 active:scale-90 transition-all"
+                          className="p-2 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors"
                         >
-                          <Check size={18} />
+                          <Check size={16} />
                         </button>
                       </div>
                     ) : (
@@ -1112,7 +1196,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             setCurrentProduct({ ...currentProduct, price: 0 });
                           }
                         }}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-6 pr-3 py-2 text-[13px] font-normal outline-none focus:ring-2 focus:ring-orange-500/20 text-gray-900 transition-all focus:bg-white"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-6 pr-3 py-2 text-[13px] font-normal outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 text-gray-900 transition-all duration-300 shadow-sm"
                       />
                     </div>
                   </div>
@@ -1122,7 +1206,7 @@ const Inventory: React.FC<InventoryProps> = ({
                     </label>
                     <div className="relative">
                       {isCustomUnit ? (
-                        <div className="relative group/unit">
+                        <div className="relative">
                           <input
                             type="text"
                             value={currentProduct.unit || ""}
@@ -1133,24 +1217,20 @@ const Inventory: React.FC<InventoryProps> = ({
                               })
                             }
                             placeholder="Unit..."
-                            className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-3 pr-10 py-2.5 text-sm outline-none focus:ring-2 focus:ring-orange-500/20 focus:bg-white focus:border-orange-200 transition-all shadow-inner"
+                            className="w-full bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-sm"
                             autoFocus
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") setIsCustomUnit(false);
-                              if (e.key === "Escape") {
-                                setIsCustomUnit(false);
-                                setCurrentProduct({
-                                  ...currentProduct,
-                                  unit: "pc",
-                                });
-                              }
-                            }}
                           />
                           <button
-                            onClick={() => setIsCustomUnit(false)}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 flex items-center justify-center text-orange-600 hover:text-orange-700 active:scale-90 transition-all"
+                            onClick={() => {
+                              setIsCustomUnit(false);
+                              setCurrentProduct({
+                                ...currentProduct,
+                                unit: "pc",
+                              });
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-orange-600 font-bold hover:underline"
                           >
-                            <Check size={18} />
+                            Reset
                           </button>
                         </div>
                       ) : (
@@ -1213,7 +1293,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             });
                           }
                         }}
-                        className="w-full bg-gray-50 border-0 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-[13px] transition-all border border-gray-100"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-10 pr-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-[13px] transition-all duration-300 shadow-sm"
                       />
                     </div>
                   </div>
@@ -1241,7 +1321,7 @@ const Inventory: React.FC<InventoryProps> = ({
                           setCurrentProduct({ ...currentProduct, stock: 0 });
                         }
                       }}
-                      className="w-full bg-gray-50 border-0 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-orange-500/20 focus:bg-white border-transparent focus:border-orange-200 outline-none text-gray-900 text-[13px] transition-all border border-gray-100"
+                      className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-[13px] transition-all duration-300 shadow-sm"
                     />
                   </div>
                 </div>
@@ -1274,7 +1354,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             description: e.target.value,
                           })
                         }
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 h-20 text-sm outline-none resize-none focus:ring-2 focus:ring-orange-500/20 text-gray-600 leading-relaxed"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 h-20 text-sm outline-none resize-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-400 focus:bg-white transition-all duration-300 text-gray-600 leading-relaxed shadow-sm"
                         placeholder="Product highlights..."
                       ></textarea>
                     </div>

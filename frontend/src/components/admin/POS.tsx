@@ -45,8 +45,15 @@ const POS: React.FC<POSProps> = ({
   onLogout,
   isSidebarCollapsed,
 }) => {
+  const formatCurrency = (amount: number) => {
+    return amount.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
   const [searchQuery, setSearchQuery] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [cartSearchQuery, setCartSearchQuery] = useState("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const cartContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -175,23 +182,40 @@ const POS: React.FC<POSProps> = ({
 
   // Computed Values
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchesCategory =
-        activeCategory === "All" || product.category === activeCategory;
-      const matchesSearch =
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (product.barcode &&
-          product.barcode.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchesStock = product.stock > 0; // POS only shows in-stock items generally?
-      // Original logic:
-      // const matchesStock = stockFilter === 'all' || (stockFilter === 'inStock' && product.stock > 0) ...
-      // But stockFilter was 'all' by default in AdminPanel state.
-      // However, usually POS shouldn't show OOS items or should dim them.
-      // Let's keep it simple: Show all matching category/search, but Cart logic prevents adding OOS.
-      // Actually AdminPanel `filteredProducts` used `stockFilter`.
-      return matchesCategory && matchesSearch;
-    });
+    return products
+      .filter((product) => {
+        const matchesCategory =
+          activeCategory === "All" || product.category === activeCategory;
+        const matchesSearch =
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (product.barcode &&
+            product.barcode.toLowerCase().includes(searchQuery.toLowerCase()));
+        return matchesCategory && matchesSearch;
+      })
+      .sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA; // Default to newest first
+      });
   }, [products, activeCategory, searchQuery]);
+
+  const filteredCart = useMemo(() => {
+    const query = cartSearchQuery.toLowerCase();
+    if (!query) return cart;
+
+    return [...cart]
+      .filter((item) => item.name.toLowerCase().includes(query))
+      .sort((a, b) => {
+        const startsWithA = a.name.toLowerCase().startsWith(query);
+        const startsWithB = b.name.toLowerCase().startsWith(query);
+
+        if (startsWithA && !startsWithB) return -1;
+        if (!startsWithA && startsWithB) return 1;
+
+        // Maintain original relative order for both starting or both not starting with query
+        return cart.indexOf(a) - cart.indexOf(b);
+      });
+  }, [cart, cartSearchQuery]);
 
   const cartTotal = useMemo(
     () => cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -212,6 +236,7 @@ const POS: React.FC<POSProps> = ({
   // Actions
   const addToCart = (product: Product) => {
     if (product.stock <= 0) return;
+    setCartSearchQuery(""); // Clear search to show newly added item
 
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
@@ -247,13 +272,18 @@ const POS: React.FC<POSProps> = ({
   };
 
   const setQuantity = (id: string, value: string) => {
-    let newQty = parseInt(value);
-    if (isNaN(newQty)) {
+    // Strictly limit to 4 digits
+    if (value.length > 4) return;
+
+    if (value === "") {
       setCart((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, quantity: 1 } : item)),
+        prev.map((item) => (item.id === id ? { ...item, quantity: 0 } : item)),
       );
       return;
     }
+
+    let newQty = parseInt(value);
+    if (isNaN(newQty)) return;
 
     // Cap at 4 digits (max 9999)
     if (newQty > 9999) newQty = 9999;
@@ -261,7 +291,7 @@ const POS: React.FC<POSProps> = ({
     setCart((prev) => {
       return prev.map((item) => {
         if (item.id === id) {
-          if (newQty <= 0) return { ...item, quantity: 1 };
+          if (newQty < 0) return { ...item, quantity: 0 };
           const product = products.find((p) => p.id === id);
           if (product && newQty > product.stock)
             return { ...item, quantity: product.stock };
@@ -334,6 +364,7 @@ const POS: React.FC<POSProps> = ({
 
       // 5. Clear Cart
       setCart([]);
+      setCartSearchQuery(""); // Reset search query
 
       // 6. Close confirmation dialog
       setShowCheckoutConfirm(false);
@@ -370,6 +401,7 @@ const POS: React.FC<POSProps> = ({
     };
 
     setCart((prev) => [...prev, customItem]);
+    setCartSearchQuery(""); // Clear search to show newly added item
 
     // Reset and close
     setCustomItemName("");
@@ -378,11 +410,11 @@ const POS: React.FC<POSProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-transparent overflow-hidden">
+    <div className="flex flex-col h-full bg-gray-50 rounded-t-[2.5rem] overflow-hidden">
       {/* Unified POS Header with Pill Categories Stacking */}
-      <div className="bg-transparent px-4 pt-0 pb-1.5 flex flex-col gap-1.5 flex-shrink-0">
+      <div className="bg-transparent px-4 pt-0 pb-2 flex flex-col gap-2 flex-shrink-0">
         {/* Terminal Header */}
-        <div className="flex items-center justify-between py-3 px-6 bg-white/70 backdrop-blur-xl rounded-[2rem] shadow-[0_10px_35px_-10px_rgba(249,115,22,0.18)] border border-orange-100/30 relative overflow-hidden group">
+        <div className="flex items-center justify-between py-3 px-6 bg-white/70 backdrop-blur-xl rounded-full shadow-[0_15px_35px_-5px_rgba(249,115,22,0.12),0_5px_15px_-3px_rgba(0,0,0,0.04)] relative border border-white/40 group overflow-hidden">
           {/* Subtle Inner Glow */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
@@ -409,7 +441,7 @@ const POS: React.FC<POSProps> = ({
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-1.5 bg-orange-50/30 border border-orange-100/50 rounded-full text-sm text-gray-700 placeholder:text-gray-400/80 outline-none focus:ring-4 focus:ring-orange-500/5 focus:bg-white focus:border-orange-200 transition-all duration-300 shadow-inner"
+              className="w-full pl-10 pr-4 py-1.5 bg-orange-50/10 border border-orange-100/30 rounded-full text-sm text-gray-700 placeholder:text-gray-400/80 outline-none focus:ring-4 focus:ring-orange-500/5 focus:bg-white focus:border-orange-200 transition-all duration-300 shadow-inner"
             />
           </div>
 
@@ -417,28 +449,29 @@ const POS: React.FC<POSProps> = ({
           <div className="absolute -left-1/4 top-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-150%] group-hover:translate-x-[350%] transition-transform duration-[1500ms]" />
         </div>
 
-        <div className="flex flex-col gap-1">
-          {/* Advanced Category Navigation */}
-          <div className="relative flex items-center group/nav px-2 py-0.5">
-            {/* Left Indicator - Positioned better */}
+        <div className="flex flex-col gap-2">
+          {/* Scrollable Category Pills with Arrows */}
+          <div className="relative flex items-center group/nav">
             {canScrollLeft && (
               <button
                 onClick={() => scroll("left")}
-                className="absolute left-2 z-20 p-2.5 bg-white shadow-[0_4px_15px_rgba(0,0,0,0.06)] rounded-full border border-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white transition-all active:scale-90 animate-in fade-in slide-in-from-left-4 duration-500 flex items-center justify-center group/btn"
+                className="absolute left-0 z-20 p-2 bg-white shadow-lg rounded-full border border-gray-100 text-gray-600 hover:text-blue-600 transition-all active:scale-95 animate-in fade-in slide-in-from-left-2 duration-300"
+                style={{ marginLeft: "4px" }}
               >
-                <ChevronLeft
-                  size={18}
-                  className="group-hover/btn:-translate-x-0.5 transition-transform"
-                />
+                <ChevronLeft size={20} />
               </button>
             )}
 
             <div
               ref={scrollContainerRef}
               onScroll={checkScroll}
-              className="overflow-x-auto no-scrollbar scroll-smooth w-full flex items-center py-1.5"
+              className="overflow-x-auto no-scrollbar py-1 w-full flex items-center"
             >
-              <div className="flex items-center gap-3 px-4 min-w-max">
+              <div
+                className={`flex items-center gap-2 md:gap-3 min-w-max transition-all duration-300 ${
+                  canScrollLeft || canScrollRight ? "px-14" : "px-2"
+                }`}
+              >
                 {(categories.includes("All")
                   ? categories
                   : ["All", ...categories]
@@ -458,16 +491,13 @@ const POS: React.FC<POSProps> = ({
               </div>
             </div>
 
-            {/* Right Indicator - Positioned better */}
             {canScrollRight && (
               <button
                 onClick={() => scroll("right")}
-                className="absolute right-2 z-20 p-2.5 bg-white shadow-[0_4px_15px_rgba(0,0,0,0.06)] rounded-full border border-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white transition-all active:scale-90 animate-in fade-in slide-in-from-right-4 duration-500 flex items-center justify-center group/btn"
+                className="absolute right-0 z-20 p-2 bg-white shadow-lg rounded-full border border-gray-100 text-gray-600 hover:text-blue-600 transition-all active:scale-95 animate-in fade-in slide-in-from-right-2 duration-300"
+                style={{ marginRight: "4px" }}
               >
-                <ChevronRight
-                  size={18}
-                  className="group-hover/btn:translate-x-0.5 transition-transform"
-                />
+                <ChevronRight size={20} />
               </button>
             )}
           </div>
@@ -551,13 +581,13 @@ const POS: React.FC<POSProps> = ({
         >
           {/* Bottom Sheet Handle (Mobile Only) */}
           <div
-            className="w-full py-4 flex justify-center md:hidden"
+            className="w-full py-3 flex justify-center md:hidden"
             onClick={() => setIsCartVisible(false)}
           >
             <div className="w-12 h-1.5 bg-gray-200 rounded-full" />
           </div>
 
-          <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between flex-shrink-0">
+          <div className="px-6 py-2.5 border-b border-gray-50 flex items-center justify-between flex-shrink-0">
             <h3 className="font-bold text-gray-800 text-lg flex items-center gap-4">
               <div className="relative">
                 <ShoppingCart size={22} className="text-orange-500" />
@@ -578,9 +608,36 @@ const POS: React.FC<POSProps> = ({
             </button>
           </div>
 
+          {/* Cart Search Bar */}
+          {cart.length > 0 && (
+            <div className="px-6 pt-1 pb-1 border-b border-gray-50/50 flex-shrink-0">
+              <div className="relative group/cartsearch">
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within/cartsearch:text-orange-500 transition-colors"
+                  size={14}
+                />
+                <input
+                  type="text"
+                  placeholder="Find in cart..."
+                  value={cartSearchQuery}
+                  onChange={(e) => setCartSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-8 py-1.5 bg-gray-50 border border-gray-100 rounded-xl text-[11px] outline-none focus:ring-4 focus:ring-orange-500/5 focus:bg-white focus:border-orange-200 transition-all duration-300"
+                />
+                {cartSearchQuery && (
+                  <button
+                    onClick={() => setCartSearchQuery("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-lg text-gray-400"
+                  >
+                    <X size={12} />
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           <div
             ref={cartContainerRef}
-            className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-2 no-scrollbar"
+            className="flex-1 overflow-y-auto px-2 pb-2 pt-1 lg:px-3 lg:pb-3 lg:pt-1 space-y-2 no-scrollbar"
           >
             {cart.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-4">
@@ -589,8 +646,13 @@ const POS: React.FC<POSProps> = ({
                 </div>
                 <p className="font-medium">Cart is empty</p>
               </div>
+            ) : filteredCart.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-gray-400 py-10">
+                <Search size={24} className="opacity-20 mb-2" />
+                <p className="text-xs">No matching items in cart</p>
+              </div>
             ) : (
-              cart.map((item) => (
+              filteredCart.map((item) => (
                 <div
                   key={item.id}
                   className="flex items-center gap-1.5 lg:gap-2 group"
@@ -606,9 +668,8 @@ const POS: React.FC<POSProps> = ({
                     <p className="text-[13px] lg:text-[15px] font-normal text-gray-800 truncate leading-tight">
                       {item.name}
                     </p>
-                    <p className="text-[12px] lg:text-[13px] font-normal text-orange-600">
-                      {CURRENCY}
-                      {item.price.toFixed(2)}
+                    <p className="text-[12px] lg:text-[13px] font-bold text-orange-600">
+                      {CURRENCY}&nbsp;{formatCurrency(item.price)}
                     </p>
                   </div>
                   <div className="flex items-center gap-0.5 lg:gap-1">
@@ -621,8 +682,19 @@ const POS: React.FC<POSProps> = ({
                       </button>
                       <input
                         type="number"
-                        value={item.quantity}
+                        min="1"
+                        max="9999"
+                        value={item.quantity === 0 ? "" : item.quantity}
                         onChange={(e) => setQuantity(item.id, e.target.value)}
+                        onBlur={(e) => {
+                          if (
+                            e.target.value === "" ||
+                            parseInt(e.target.value) <= 0
+                          ) {
+                            setQuantity(item.id, "1");
+                          }
+                        }}
+                        onFocus={(e) => e.target.select()}
                         className="text-[11px] font-normal w-7 text-center bg-white rounded-md border-none focus:outline-none focus:ring-0 p-0 no-spinners shadow-sm"
                       />
                       <button
@@ -659,14 +731,13 @@ const POS: React.FC<POSProps> = ({
             </button>
           </div>
 
-          <div className="p-4 lg:p-6 bg-gray-50/50 border-t border-gray-100 flex-shrink-0">
-            <div className="flex justify-between items-center mb-6">
+          <div className="p-3 lg:p-4 bg-gray-50/50 border-t border-gray-100 flex-shrink-0">
+            <div className="flex justify-between items-center mb-3">
               <span className="text-gray-500 font-medium tracking-wide">
                 TOTAL
               </span>
               <span className="text-xl font-bold text-gray-900 tracking-tight">
-                {CURRENCY}
-                {cartTotal.toFixed(2)}
+                {CURRENCY}&nbsp;{formatCurrency(cartTotal)}
               </span>
             </div>
             <button
@@ -694,8 +765,7 @@ const POS: React.FC<POSProps> = ({
                 <span className="font-medium">Review Order</span>
               </div>
               <span className="font-bold text-lg">
-                {CURRENCY}
-                {cartTotal.toFixed(2)}
+                {CURRENCY}&nbsp;{formatCurrency(cartTotal)}
               </span>
             </button>
           </div>
@@ -740,9 +810,9 @@ const POS: React.FC<POSProps> = ({
                           x {item.quantity}
                         </span>
                       </div>
-                      <span className="font-medium text-gray-800">
-                        {CURRENCY}
-                        {(item.price * item.quantity).toFixed(2)}
+                      <span className="font-bold text-gray-800">
+                        {CURRENCY}&nbsp;
+                        {formatCurrency(item.price * item.quantity)}
                       </span>
                     </div>
                   ))}
@@ -750,8 +820,7 @@ const POS: React.FC<POSProps> = ({
                 <div className="border-t border-gray-200 mt-3 pt-3 flex justify-between items-center">
                   <span className="font-bold text-gray-800">Total:</span>
                   <span className="text-xl font-bold text-green-600">
-                    {CURRENCY}
-                    {cartTotal.toFixed(2)}
+                    {CURRENCY}&nbsp;{formatCurrency(cartTotal)}
                   </span>
                 </div>
               </div>
@@ -763,7 +832,7 @@ const POS: React.FC<POSProps> = ({
                     Amount Received
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">
                       {CURRENCY}
                     </span>
                     <input
@@ -796,7 +865,7 @@ const POS: React.FC<POSProps> = ({
                       placeholder="0.00"
                       min="0"
                       step="0.01"
-                      className="w-full pl-8 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50 text-gray-900 text-sm"
+                      className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-gray-100 focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-400 focus:bg-white bg-gray-50 text-gray-900 text-sm transition-all duration-300 shadow-sm"
                     />
                   </div>
                 </div>
@@ -805,16 +874,15 @@ const POS: React.FC<POSProps> = ({
                   <div className="bg-gray-50 rounded-lg p-3 space-y-2">
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-600">Total Amount:</span>
-                      <span className="font-medium text-gray-800">
-                        {CURRENCY}
-                        {cartTotal.toFixed(2)}
+                      <span className="font-bold text-gray-800">
+                        {CURRENCY}&nbsp;{formatCurrency(cartTotal)}
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-600">Payment:</span>
-                      <span className="font-medium text-gray-800">
-                        {CURRENCY}
-                        {parseFloat(customerPayment || "0").toFixed(2)}
+                      <span className="font-bold text-gray-800">
+                        {CURRENCY}&nbsp;
+                        {formatCurrency(parseFloat(customerPayment || "0"))}
                       </span>
                     </div>
                     <div className="border-t border-gray-200 pt-2 flex justify-between items-center">
@@ -824,8 +892,7 @@ const POS: React.FC<POSProps> = ({
                           change >= 0 ? "text-green-600" : "text-red-600"
                         }`}
                       >
-                        {CURRENCY}
-                        {change.toFixed(2)}
+                        {CURRENCY}&nbsp;{formatCurrency(change)}
                       </span>
                     </div>
                     {!isPaymentValid && (
@@ -891,7 +958,7 @@ const POS: React.FC<POSProps> = ({
                     value={customItemName}
                     onChange={(e) => setCustomItemName(e.target.value)}
                     placeholder="Enter item name..."
-                    className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2 text-sm focus:ring-4 focus:ring-blue-50 focus:bg-white outline-none transition-all placeholder:text-gray-300"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 text-sm focus:ring-4 focus:ring-blue-500/10 focus:bg-white focus:border-blue-400 outline-none transition-all duration-300 placeholder:text-gray-300 shadow-sm"
                     autoFocus
                   />
                 </div>
@@ -909,7 +976,7 @@ const POS: React.FC<POSProps> = ({
                       value={customItemPrice}
                       onChange={(e) => setCustomItemPrice(e.target.value)}
                       placeholder="0.00"
-                      className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-4 focus:ring-blue-50 focus:bg-white outline-none transition-all placeholder:text-gray-300 font-bold"
+                      className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-4 focus:ring-blue-500/10 focus:bg-white focus:border-blue-400 outline-none transition-all duration-300 placeholder:text-gray-300 font-bold shadow-sm"
                     />
                   </div>
                 </div>

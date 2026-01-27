@@ -155,10 +155,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="mt-1 flex items-center justify-between">
           <div className="flex flex-col">
             <div className="text-[14px] md:text-[16px] font-bold text-gray-900 flex items-baseline leading-none">
-              <span className="text-[9px] md:text-[11px] font-normal mr-0.5">
+              <span className="text-[9px] md:text-[11px] font-bold mr-1">
                 {CURRENCY}
               </span>
-              {product.price}
+              {product.price.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
               {product.unit && (
                 <span className="text-[9px] md:text-[11px] font-normal text-gray-600 ml-1 lowercase flex items-baseline">
                   <span className="text-gray-400 mx-0.5 scale-90">/</span>
