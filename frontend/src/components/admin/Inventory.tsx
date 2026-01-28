@@ -786,7 +786,7 @@ const Inventory: React.FC<InventoryProps> = ({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar pb-20">
+      <div className="flex-1 overflow-y-auto no-scrollbar pb-4">
         {filteredProducts.length === 0 ? (
           <div className="text-center py-24 bg-white/50 backdrop-blur-sm rounded-3xl border border-white shadow-sm">
             <div className="w-24 h-24 bg-orange-50/50 rounded-full flex items-center justify-center mx-auto mb-6 relative ring-1 ring-orange-100/20">

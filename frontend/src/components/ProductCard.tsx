@@ -47,7 +47,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
       ${isInCart ? "border-orange-200 shadow-[0_5px_15px_rgba(249,115,22,0.1)] bg-white/40" : "border-gray-300/50"}
       `}
     >
-      <div className="relative mb-2 overflow-hidden rounded-[1.2rem] md:rounded-[1.5rem] aspect-square bg-gray-50">
+      <div
+        className={`relative mb-2 overflow-hidden rounded-[1.2rem] md:rounded-[1.5rem] ${isAdmin ? "aspect-[1/0.92]" : "aspect-[1/1.04]"} bg-gray-50`}
+      >
         {product.image && product.image !== "No Image" ? (
           <img
             src={product.image}
