@@ -1056,13 +1056,13 @@ const Inventory: React.FC<InventoryProps> = ({
                       Category <span className="text-red-500">*</span>
                     </label>
                     {isAddingNewCategory ? (
-                      <div className="flex gap-2">
+                      <div className="relative group">
                         <input
                           type="text"
                           value={newCategoryName}
                           onChange={(e) => setNewCategoryName(e.target.value)}
                           placeholder="Category..."
-                          className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-sm"
+                          className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-4 pr-10 py-2.5 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-sm"
                           autoFocus
                         />
                         <button
@@ -1077,11 +1077,13 @@ const Inventory: React.FC<InventoryProps> = ({
                               });
                               setIsAddingNewCategory(false);
                               setNewCategoryName("");
+                            } else {
+                              setIsAddingNewCategory(false);
                             }
                           }}
-                          className="p-2 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors"
+                          className="absolute right-1 top-1/2 -translate-y-1/2 p-2 text-orange-600 hover:text-orange-700 transition-colors z-10"
                         >
-                          <Check size={16} />
+                          <Check size={18} strokeWidth={3} />
                         </button>
                       </div>
                     ) : (
@@ -1206,7 +1208,7 @@ const Inventory: React.FC<InventoryProps> = ({
                     </label>
                     <div className="relative">
                       {isCustomUnit ? (
-                        <div className="relative">
+                        <div className="relative group">
                           <input
                             type="text"
                             value={currentProduct.unit || ""}
@@ -1217,20 +1219,23 @@ const Inventory: React.FC<InventoryProps> = ({
                               })
                             }
                             placeholder="Unit..."
-                            className="w-full bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-sm"
+                            className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-4 pr-10 py-2.5 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-sm"
                             autoFocus
                           />
                           <button
+                            type="button"
                             onClick={() => {
+                              if (!currentProduct.unit?.trim()) {
+                                setCurrentProduct({
+                                  ...currentProduct,
+                                  unit: "pc",
+                                });
+                              }
                               setIsCustomUnit(false);
-                              setCurrentProduct({
-                                ...currentProduct,
-                                unit: "pc",
-                              });
                             }}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-orange-600 font-bold hover:underline"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 p-2 text-orange-600 hover:text-orange-700 transition-colors z-10"
                           >
-                            Reset
+                            <Check size={18} strokeWidth={3} />
                           </button>
                         </div>
                       ) : (
