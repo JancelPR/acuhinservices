@@ -16,12 +16,12 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 print:p-0 print:static print:block">
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-md"
         onClick={onClose}
       />
-      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] w-full max-w-[320px] print:max-w-none print:w-auto print:max-h-none print:shadow-none print:rounded-none relative z-[1010]">
+      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] w-full max-w-[320px] print:max-w-none print:w-full print:max-h-none print:shadow-none print:rounded-none print:overflow-visible relative z-[1010]">
         {/* Header - Hidden on print */}
         <div className="p-2 border-b border-gray-100 flex justify-between items-center bg-gray-50 print:hidden">
           <h2 className="font-bold text-gray-800 text-xs">
@@ -38,7 +38,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
 
         {/* Receipt Content - Printable Area */}
         <div
-          className="p-3 overflow-y-auto flex-1 bg-white print:p-3"
+          className="p-3 overflow-y-auto flex-1 bg-white print:p-0 print:overflow-visible"
           id="printable-receipt"
         >
           <style>{`
@@ -47,22 +47,47 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
                 size: 80mm auto;
                 margin: 0;
               }
+              html, body {
+                height: auto !important;
+                overflow: visible !important;
+                background: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
               body * {
-                visibility: hidden;
+                visibility: hidden !important;
               }
               #printable-receipt, #printable-receipt * {
-                visibility: visible;
+                visibility: visible !important;
+                color: black !important;
               }
               #printable-receipt {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 80mm;
-                max-width: 80mm;
-                margin: 0;
-                padding: 6mm;
-                background: white;
-                box-shadow: none;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 80mm !important;
+                margin: 0 !important;
+                padding: 6mm 6mm 15mm 6mm !important; /* Added 15mm bottom padding for the cutter */
+                background: white !important;
+                min-height: auto !important;
+                box-shadow: none !important;
+              }
+              /* Hide fixed containers that might interfere */
+              .fixed {
+                position: static !important;
+                display: block !important;
+                background: none !important;
+                backdrop-filter: none !important;
+                box-shadow: none !important;
+              }
+              /* Ensure table borders are visible */
+              .border-t, .border-b, .border-dashed {
+                border-color: #000 !important;
+                border-width: 1px !important;
+                border-style: solid !important;
+              }
+              .border-dashed {
+                border-style: dashed !important;
               }
             }
           `}</style>

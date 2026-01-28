@@ -665,7 +665,7 @@ const POS: React.FC<POSProps> = ({
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] lg:text-[15px] font-normal text-gray-800 truncate leading-tight">
+                    <p className="text-[13px] lg:text-[15px] font-medium text-gray-800 truncate leading-tight">
                       {item.name}
                     </p>
                     <p className="text-[12px] lg:text-[13px] font-bold text-orange-600">
