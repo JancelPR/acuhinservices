@@ -1022,7 +1022,7 @@ const Inventory: React.FC<InventoryProps> = ({
                         name: e.target.value,
                       })
                     }
-                    className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-sm transition-all duration-300 shadow-sm"
+                    className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-sm transition-all duration-300 shadow-inner font-google-sans"
                     placeholder="e.g. SkyFlakes"
                   />
                 </div>
@@ -1045,7 +1045,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             barcode: e.target.value,
                           })
                         }
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-10 pr-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-sm transition-all duration-300 shadow-sm placeholder:text-[11px]"
+                        className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl pl-10 pr-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-sm transition-all duration-300 shadow-inner placeholder:text-[11px] font-google-sans"
                         placeholder="Scan or enter barcode"
                       />
                     </div>
@@ -1062,7 +1062,7 @@ const Inventory: React.FC<InventoryProps> = ({
                           value={newCategoryName}
                           onChange={(e) => setNewCategoryName(e.target.value)}
                           placeholder="Category..."
-                          className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-4 pr-10 py-2.5 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-sm"
+                          className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl pl-4 pr-10 py-2.5 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-inner font-google-sans"
                           autoFocus
                         />
                         <button
@@ -1083,7 +1083,7 @@ const Inventory: React.FC<InventoryProps> = ({
                           }}
                           className="absolute right-1 top-1/2 -translate-y-1/2 p-2 text-orange-600 hover:text-orange-700 transition-colors z-10"
                         >
-                          <Check size={18} strokeWidth={3} />
+                          <Check size={18} strokeWidth={2} />
                         </button>
                       </div>
                     ) : (
@@ -1093,10 +1093,10 @@ const Inventory: React.FC<InventoryProps> = ({
                           onClick={() =>
                             setIsModalCategoryOpen(!isModalCategoryOpen)
                           }
-                          className={`w-full flex items-center justify-between px-3 py-2 bg-gray-50/50 border rounded-2xl text-sm transition-all duration-300 group ${
+                          className={`w-full flex items-center justify-between px-3 py-2 bg-gray-100/80 border rounded-2xl text-sm transition-all duration-300 group shadow-inner font-google-sans ${
                             isModalCategoryOpen
                               ? "border-orange-200 ring-4 ring-orange-500/5 bg-white shadow-inner"
-                              : "border-gray-100 hover:border-orange-100 hover:bg-gray-50"
+                              : "border-gray-200/60 hover:border-orange-100 hover:bg-gray-50"
                           }`}
                         >
                           <span
@@ -1175,7 +1175,7 @@ const Inventory: React.FC<InventoryProps> = ({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-normal text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
                       Price Details <span className="text-red-500">*</span>
                     </label>
                     <div className="relative group">
@@ -1198,7 +1198,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             setCurrentProduct({ ...currentProduct, price: 0 });
                           }
                         }}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-6 pr-3 py-2 text-[13px] font-normal outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 text-gray-900 transition-all duration-300 shadow-sm"
+                        className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl pl-6 pr-3 py-2 text-[13px] font-normal outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 text-gray-900 transition-all duration-300 shadow-inner font-google-sans"
                       />
                     </div>
                   </div>
@@ -1219,7 +1219,7 @@ const Inventory: React.FC<InventoryProps> = ({
                               })
                             }
                             placeholder="Unit..."
-                            className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-4 pr-10 py-2.5 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-sm"
+                            className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl pl-4 pr-10 py-2.5 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-inner font-google-sans"
                             autoFocus
                           />
                           <button
@@ -1235,7 +1235,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             }}
                             className="absolute right-1 top-1/2 -translate-y-1/2 p-2 text-orange-600 hover:text-orange-700 transition-colors z-10"
                           >
-                            <Check size={18} strokeWidth={3} />
+                            <Check size={18} strokeWidth={2} />
                           </button>
                         </div>
                       ) : (
@@ -1266,7 +1266,7 @@ const Inventory: React.FC<InventoryProps> = ({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-normal text-gray-400 uppercase tracking-wider mb-1.5 ml-1 truncate">
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1 truncate">
                       Stock Alert
                     </label>
                     <div className="relative">
@@ -1298,12 +1298,12 @@ const Inventory: React.FC<InventoryProps> = ({
                             });
                           }
                         }}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl pl-10 pr-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-[13px] transition-all duration-300 shadow-sm"
+                        className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl pl-10 pr-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-[13px] transition-all duration-300 shadow-inner font-google-sans"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-normal text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
                       Stock Quantity <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -1326,7 +1326,7 @@ const Inventory: React.FC<InventoryProps> = ({
                           setCurrentProduct({ ...currentProduct, stock: 0 });
                         }
                       }}
-                      className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-[13px] transition-all duration-300 shadow-sm"
+                      className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-[13px] transition-all duration-300 shadow-inner font-google-sans"
                     />
                   </div>
                 </div>
@@ -1359,7 +1359,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             description: e.target.value,
                           })
                         }
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 h-20 text-sm outline-none resize-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-400 focus:bg-white transition-all duration-300 text-gray-600 leading-relaxed shadow-sm"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 h-20 text-sm outline-none resize-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-400 focus:bg-white transition-all duration-300 text-gray-600 leading-relaxed shadow-inner"
                         placeholder="Product highlights..."
                       ></textarea>
                     </div>
@@ -1369,7 +1369,7 @@ const Inventory: React.FC<InventoryProps> = ({
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-50 flex flex-col sm:flex-row gap-3">
+            <div className="px-6 pb-6 pt-0 flex flex-col sm:flex-row items-center gap-3">
               <div className="flex-1 flex gap-2">
                 <button
                   onClick={() => {
