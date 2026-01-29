@@ -412,9 +412,9 @@ const POS: React.FC<POSProps> = ({
   return (
     <div className="flex flex-col h-full bg-gray-50 rounded-t-[2.5rem] overflow-hidden">
       {/* Unified POS Header with Pill Categories Stacking */}
-      <div className="bg-transparent pl-2 pr-4 pt-0 pb-2 flex flex-col gap-2 flex-shrink-0">
+      <div className="bg-transparent pl-0 pr-4 pt-0 pb-2 flex flex-col gap-2 flex-shrink-0">
         {/* Terminal Header */}
-        <div className="flex items-center justify-between py-3 pl-3 pr-6 bg-white/70 backdrop-blur-xl rounded-full shadow-[0_15px_35px_-5px_rgba(249,115,22,0.12),0_5px_15px_-3px_rgba(0,0,0,0.04)] relative border border-white/40 group overflow-hidden">
+        <div className="flex items-center justify-between py-3 px-5 bg-white/70 backdrop-blur-xl rounded-full shadow-[0_15px_35px_-5px_rgba(249,115,22,0.12),0_5px_15px_-3px_rgba(0,0,0,0.04)] relative border border-white/40 group overflow-hidden">
           {/* Subtle Inner Glow */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
@@ -506,7 +506,7 @@ const POS: React.FC<POSProps> = ({
 
       <div className="flex flex-1 overflow-hidden relative">
         {/* POS Product Grid */}
-        <div className="flex-1 overflow-y-auto pl-2 pr-4 lg:pl-2 lg:pr-4 pb-24 lg:pb-6 no-scrollbar">
+        <div className="flex-1 overflow-y-auto pl-0 pr-4 pb-24 lg:pb-6 no-scrollbar">
           {filteredProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 px-4 w-full h-[60vh]">
               <div className="relative mb-8">
