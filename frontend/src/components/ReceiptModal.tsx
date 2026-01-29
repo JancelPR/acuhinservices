@@ -49,36 +49,20 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
                 size: 80mm auto;
                 margin: 0mm;
               }
-              html, body {
-                height: auto;
-                margin: 0 !important;
-                padding: 0 !important;
-                background: white;
+              body * {
+                visibility: hidden;
               }
-              /* Hide everything by default */
-              body > * {
-                display: none !important;
-              }
-              /* Only show the receipt and its parents */
               #printable-receipt, #printable-receipt * {
-                display: block !important;
                 visibility: visible !important;
+                color: black !important; /* Force black for thermal heads */
               }
-              /* Force specific table/flex displays back */
-              #printable-receipt table { display: table !important; }
-              #printable-receipt tr { display: table-row !important; }
-              #printable-receipt td, #printable-receipt th { display: table-cell !important; }
-              #printable-receipt .flex { display: flex !important; }
-              #printable-receipt .justify-between { justify-content: space-between !important; }
-              
               #printable-receipt {
-                display: block !important;
                 position: absolute;
                 left: 0;
                 top: 0;
-                width: 72mm !important; /* POS industry standard printable width */
-                margin: 0 auto !important;
-                padding: 2mm 4mm !important;
+                width: 72mm !important;
+                margin: 0;
+                padding: 4mm !important;
                 background: white;
                 box-shadow: none !important;
               }
