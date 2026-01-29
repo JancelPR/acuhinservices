@@ -406,13 +406,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({
                       RECEIPT NO
                     </th>
                     <th className="sticky top-0 z-10 bg-gray-50 px-3 md:px-4 py-3 md:py-4 text-left text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      INV#
-                    </th>
-                    <th className="sticky top-0 z-10 bg-gray-50 px-3 md:px-4 py-3 md:py-4 text-left text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider">
                       Date
-                    </th>
-                    <th className="sticky top-0 z-10 bg-gray-50 px-3 md:px-4 py-3 md:py-4 text-left text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      Action
                     </th>
                     <th className="sticky top-0 z-10 bg-gray-50 px-3 md:px-4 py-3 md:py-4 text-center text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider">
                       Items
@@ -438,9 +432,6 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({
                     >
                       <td className="px-3 md:px-4 py-3 md:py-4 text-[11px] md:text-sm font-bold text-orange-600 whitespace-nowrap">
                         {t.receiptNumber || "-"}
-                      </td>
-                      <td className="px-3 md:px-4 py-3 md:py-4 text-[11px] md:text-sm text-gray-900 whitespace-nowrap">
-                        #{t.id}
                       </td>
 
                       <td className="px-4 py-4 text-sm text-gray-500 whitespace-nowrap">
@@ -469,12 +460,6 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({
                             return t.date;
                           }
                         })()}
-                      </td>
-
-                      <td className="px-4 py-4 text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">
-                        <span className="px-2 py-1 bg-gray-100 rounded-md">
-                          {t.action || "CREATE_TRANSACTION"}
-                        </span>
                       </td>
 
                       <td className="px-4 py-4 text-sm text-gray-800 text-center whitespace-nowrap">
