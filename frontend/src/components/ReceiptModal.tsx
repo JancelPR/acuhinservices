@@ -16,10 +16,13 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      style={{ zIndex: 9999 }}
+    >
       <div
         className="bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] print:max-h-none print:shadow-none print:rounded-none"
-        style={{ width: "80mm", maxWidth: "80mm" }}
+        style={{ width: "72mm", maxWidth: "72mm" }}
       >
         {/* Header - Hidden on print */}
         <div className="p-2 border-b border-gray-100 flex justify-between items-center bg-gray-50 print:hidden">
@@ -37,31 +40,47 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
 
         {/* Receipt Content - Printable Area */}
         <div
-          className="p-3 overflow-y-auto flex-1 bg-white print:p-3"
+          className="p-4 overflow-y-auto flex-1 bg-white print:p-0 print:m-0"
           id="printable-receipt"
         >
           <style>{`
             @media print {
               @page {
                 size: 80mm auto;
-                margin: 0;
+                margin: 0mm;
               }
-              body * {
-                visibility: hidden;
+              html, body {
+                height: auto;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white;
               }
+              /* Hide everything by default */
+              body > * {
+                display: none !important;
+              }
+              /* Only show the receipt and its parents */
               #printable-receipt, #printable-receipt * {
-                visibility: visible;
+                display: block !important;
+                visibility: visible !important;
               }
+              /* Force specific table/flex displays back */
+              #printable-receipt table { display: table !important; }
+              #printable-receipt tr { display: table-row !important; }
+              #printable-receipt td, #printable-receipt th { display: table-cell !important; }
+              #printable-receipt .flex { display: flex !important; }
+              #printable-receipt .justify-between { justify-content: space-between !important; }
+              
               #printable-receipt {
+                display: block !important;
                 position: absolute;
                 left: 0;
                 top: 0;
-                width: 80mm;
-                max-width: 80mm;
-                margin: 0;
-                padding: 6mm;
+                width: 72mm !important; /* POS industry standard printable width */
+                margin: 0 auto !important;
+                padding: 2mm 4mm !important;
                 background: white;
-                box-shadow: none;
+                box-shadow: none !important;
               }
             }
           `}</style>
@@ -71,6 +90,9 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
             </h1>
             <p className="text-[9px] text-gray-500 mt-0.5">
               Neighborhood Convenience Store
+            </p>
+            <p className="text-[9px] text-gray-500 mt-0.5">
+              Prk. Dos, Brgy Palaka, Valladolid
             </p>
             <p className="text-[9px] text-gray-400 mt-1">{receipt.date}</p>
             <p className="text-[9px] text-gray-400">Ref: {receipt.id}</p>

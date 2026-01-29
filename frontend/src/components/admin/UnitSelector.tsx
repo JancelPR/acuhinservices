@@ -83,7 +83,7 @@ const UnitSelector: React.FC<UnitSelectorProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between px-3 py-2 bg-gray-100/80 border rounded-2xl text-sm transition-all duration-300 group shadow-inner font-google-sans ${
+        className={`w-full flex items-center justify-between px-3.5 py-2 bg-gray-50/50 border rounded-2xl text-sm transition-all duration-300 group ${
           isOpen
             ? "border-orange-200 ring-4 ring-orange-500/5 bg-white shadow-inner"
             : "border-gray-200/60 hover:border-orange-100 hover:bg-gray-50"

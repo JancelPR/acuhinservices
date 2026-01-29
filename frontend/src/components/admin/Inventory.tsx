@@ -820,18 +820,18 @@ const Inventory: React.FC<InventoryProps> = ({
       {/* Add/Edit Product Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-[1000] p-4 transition-all duration-300">
-          <div className="bg-white rounded-[24px] w-full max-w-md shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col max-h-[90vh] border border-gray-100/50">
+          <div className="bg-white rounded-[24px] w-full max-w-[400px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col max-h-[90vh] border border-gray-100/50">
             {/* Modal Header */}
-            <div className="px-6 py-4 flex justify-between items-center bg-white border-b border-gray-50">
+            <div className="px-5 py-3 flex justify-between items-center bg-white border-b border-gray-50">
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center ${
                     isEditing
                       ? "bg-orange-50 text-orange-600"
                       : "bg-orange-50 text-orange-600 shadow-sm"
                   }`}
                 >
-                  {isEditing ? <Wand2 size={20} /> : <Plus size={20} />}
+                  {isEditing ? <Wand2 size={18} /> : <Plus size={18} />}
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900 leading-tight">
@@ -855,12 +855,12 @@ const Inventory: React.FC<InventoryProps> = ({
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 overflow-visible space-y-5">
+            <div className="p-5 overflow-visible space-y-4">
               {/* Image Section - More compact at top */}
-              <div className="flex gap-4 items-start">
+              <div className="flex gap-3.5 items-start">
                 <div className="relative group">
                   <div
-                    className={`w-24 h-24 rounded-2xl bg-gray-50 border overflow-hidden flex items-center justify-center shadow-inner transition-all duration-200 ${
+                    className={`w-20 h-20 rounded-2xl bg-gray-50 border overflow-hidden flex items-center justify-center shadow-inner transition-all duration-200 ${
                       isDragging
                         ? "border-orange-300 ring-4 ring-orange-500/10 scale-105"
                         : "border-gray-200"
@@ -1022,18 +1022,18 @@ const Inventory: React.FC<InventoryProps> = ({
                         name: e.target.value,
                       })
                     }
-                    className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-sm transition-all duration-300 shadow-inner font-google-sans"
+                    className="w-full bg-gray-50/50 border border-gray-100 rounded-2xl px-4 py-2 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-sm transition-all duration-300 shadow-sm"
                     placeholder="e.g. SkyFlakes"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
                       Barcode
                     </label>
                     <div className="relative group">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors">
+                      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors">
                         <Barcode size={16} />
                       </div>
                       <input
@@ -1045,7 +1045,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             barcode: e.target.value,
                           })
                         }
-                        className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl pl-10 pr-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-sm transition-all duration-300 shadow-inner placeholder:text-[11px] font-google-sans"
+                        className="w-full bg-gray-50/50 border border-gray-100 rounded-2xl pl-10 pr-4 py-2 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-sm transition-all duration-300 shadow-sm placeholder:text-[10px]"
                         placeholder="Scan or enter barcode"
                       />
                     </div>
@@ -1056,13 +1056,13 @@ const Inventory: React.FC<InventoryProps> = ({
                       Category <span className="text-red-500">*</span>
                     </label>
                     {isAddingNewCategory ? (
-                      <div className="relative group">
+                      <div className="flex gap-2">
                         <input
                           type="text"
                           value={newCategoryName}
                           onChange={(e) => setNewCategoryName(e.target.value)}
                           placeholder="Category..."
-                          className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl pl-4 pr-10 py-2.5 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-inner font-google-sans"
+                          className="flex-1 bg-gray-50/50 border border-gray-100 rounded-2xl px-3 py-2 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-sm"
                           autoFocus
                         />
                         <button
@@ -1077,13 +1077,11 @@ const Inventory: React.FC<InventoryProps> = ({
                               });
                               setIsAddingNewCategory(false);
                               setNewCategoryName("");
-                            } else {
-                              setIsAddingNewCategory(false);
                             }
                           }}
-                          className="absolute right-1 top-1/2 -translate-y-1/2 p-2 text-orange-600 hover:text-orange-700 transition-colors z-10"
+                          className="p-1.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
                         >
-                          <Check size={18} strokeWidth={2} />
+                          <Check size={14} />
                         </button>
                       </div>
                     ) : (
@@ -1093,14 +1091,14 @@ const Inventory: React.FC<InventoryProps> = ({
                           onClick={() =>
                             setIsModalCategoryOpen(!isModalCategoryOpen)
                           }
-                          className={`w-full flex items-center justify-between px-3 py-2 bg-gray-100/80 border rounded-2xl text-sm transition-all duration-300 group shadow-inner font-google-sans ${
+                          className={`w-full flex items-center justify-between px-3.5 py-2 bg-gray-50/50 border rounded-2xl text-sm transition-all duration-300 group ${
                             isModalCategoryOpen
                               ? "border-orange-200 ring-4 ring-orange-500/5 bg-white shadow-inner"
-                              : "border-gray-200/60 hover:border-orange-100 hover:bg-gray-50"
+                              : "border-gray-100 hover:border-orange-100 hover:bg-gray-50"
                           }`}
                         >
                           <span
-                            className={`truncate text-[13px] font-medium ${currentProduct.category ? "text-gray-900" : "text-gray-400"}`}
+                            className={`truncate text-sm font-medium ${currentProduct.category ? "text-gray-900" : "text-gray-400"}`}
                           >
                             {currentProduct.category || "Select"}
                           </span>
@@ -1173,19 +1171,19 @@ const Inventory: React.FC<InventoryProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
+                    <label className="block text-[10px] font-normal text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
                       Price Details <span className="text-red-500">*</span>
                     </label>
                     <div className="relative group">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-normal">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">
                         {CURRENCY}
                       </span>
                       <input
                         type="number"
                         value={currentProduct.price || ""}
-                        placeholder="Amount"
+                        placeholder="0.00"
                         onChange={(e) => {
                           const val =
                             e.target.value === "" ? 0 : Number(e.target.value);
@@ -1198,7 +1196,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             setCurrentProduct({ ...currentProduct, price: 0 });
                           }
                         }}
-                        className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl pl-6 pr-3 py-2 text-[13px] font-normal outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 text-gray-900 transition-all duration-300 shadow-inner font-google-sans"
+                        className="w-full bg-gray-50/50 border border-gray-100 rounded-2xl pl-10 pr-4 py-2 text-sm font-medium outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 text-gray-900 transition-all duration-300 shadow-sm"
                       />
                     </div>
                   </div>
@@ -1208,7 +1206,7 @@ const Inventory: React.FC<InventoryProps> = ({
                     </label>
                     <div className="relative">
                       {isCustomUnit ? (
-                        <div className="relative group">
+                        <div className="relative">
                           <input
                             type="text"
                             value={currentProduct.unit || ""}
@@ -1219,23 +1217,20 @@ const Inventory: React.FC<InventoryProps> = ({
                               })
                             }
                             placeholder="Unit..."
-                            className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl pl-4 pr-10 py-2.5 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-inner font-google-sans"
+                            className="w-full bg-gray-50/50 border border-gray-100 rounded-2xl px-3.5 py-2 text-sm outline-none focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 transition-all duration-300 shadow-sm"
                             autoFocus
                           />
                           <button
-                            type="button"
                             onClick={() => {
-                              if (!currentProduct.unit?.trim()) {
-                                setCurrentProduct({
-                                  ...currentProduct,
-                                  unit: "pc",
-                                });
-                              }
                               setIsCustomUnit(false);
+                              setCurrentProduct({
+                                ...currentProduct,
+                                unit: "pc",
+                              });
                             }}
-                            className="absolute right-1 top-1/2 -translate-y-1/2 p-2 text-orange-600 hover:text-orange-700 transition-colors z-10"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-orange-600 font-bold hover:underline"
                           >
-                            <Check size={18} strokeWidth={2} />
+                            Reset
                           </button>
                         </div>
                       ) : (
@@ -1264,14 +1259,14 @@ const Inventory: React.FC<InventoryProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1 truncate">
+                    <label className="block text-[10px] font-normal text-gray-400 uppercase tracking-wider mb-1.5 ml-1 truncate">
                       Stock Alert
                     </label>
                     <div className="relative">
                       <div
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-400 group-hover:text-orange-500 transition-colors z-10 cursor-help"
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-orange-400 group-hover:text-orange-500 transition-colors z-10 cursor-help"
                         title="Notifies when stock level falls below this value"
                       >
                         <AlertCircle size={16} />
@@ -1298,19 +1293,19 @@ const Inventory: React.FC<InventoryProps> = ({
                             });
                           }
                         }}
-                        className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl pl-10 pr-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-[13px] transition-all duration-300 shadow-inner font-google-sans"
+                        className="w-full bg-gray-50/50 border border-gray-100 rounded-2xl pl-10 pr-4 py-2 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-sm transition-all duration-300 shadow-sm"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
+                    <label className="block text-[10px] font-normal text-gray-400 uppercase tracking-wider mb-1.5 ml-1">
                       Stock Quantity <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
                       max="9999"
                       value={currentProduct.stock || ""}
-                      placeholder="Quantity"
+                      placeholder="0"
                       onChange={(e) => {
                         const val =
                           e.target.value === "" ? 0 : Number(e.target.value);
@@ -1326,7 +1321,7 @@ const Inventory: React.FC<InventoryProps> = ({
                           setCurrentProduct({ ...currentProduct, stock: 0 });
                         }
                       }}
-                      className="w-full bg-gray-100/80 border border-gray-200/60 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-[13px] transition-all duration-300 shadow-inner font-google-sans"
+                      className="w-full bg-gray-50/50 border border-gray-100 rounded-2xl px-4 py-2 focus:ring-4 focus:ring-orange-500/10 focus:bg-white focus:border-orange-400 outline-none text-gray-900 text-sm transition-all duration-300 shadow-sm"
                     />
                   </div>
                 </div>
@@ -1359,7 +1354,7 @@ const Inventory: React.FC<InventoryProps> = ({
                             description: e.target.value,
                           })
                         }
-                        className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 h-20 text-sm outline-none resize-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-400 focus:bg-white transition-all duration-300 text-gray-600 leading-relaxed shadow-inner"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 h-20 text-sm outline-none resize-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-400 focus:bg-white transition-all duration-300 text-gray-600 leading-relaxed shadow-sm"
                         placeholder="Product highlights..."
                       ></textarea>
                     </div>
@@ -1369,7 +1364,7 @@ const Inventory: React.FC<InventoryProps> = ({
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 pb-6 pt-0 flex flex-col sm:flex-row items-center gap-3">
+            <div className="px-5 py-3.5 bg-gray-50/50 border-t border-gray-50 flex flex-col sm:flex-row gap-3">
               <div className="flex-1 flex gap-2">
                 <button
                   onClick={() => {
@@ -1377,30 +1372,30 @@ const Inventory: React.FC<InventoryProps> = ({
                     setIsPriceFocused(false);
                     setIsStockFocused(false);
                   }}
-                  className="flex-1 px-4 py-2.5 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all active:scale-95"
+                  className="flex-1 px-4 py-2 text-sm font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all active:scale-95"
                 >
                   Cancel
                 </button>
                 {isEditing && currentProduct.id && (
                   <button
                     onClick={() => handleDeleteProduct(currentProduct.id!)}
-                    className="p-2.5 text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-all active:scale-95 border border-red-100"
+                    className="p-2 text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-all active:scale-95 border border-red-100"
                     title="Delete product"
                   >
-                    <Trash2 size={20} />
+                    <Trash2 size={18} />
                   </button>
                 )}
               </div>
               <button
                 onClick={handleSaveProduct}
-                className={`sm:w-auto px-8 py-2.5 text-sm font-bold text-white rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${
+                className={`sm:w-auto px-6 py-2 text-sm font-bold text-white rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${
                   isEditing
                     ? "bg-gradient-to-r from-orange-500 to-red-600 shadow-orange-200"
                     : "bg-gradient-to-r from-orange-500/90 to-red-600 shadow-orange-100"
                 }`}
               >
-                <Save size={18} />
-                {isEditing ? "Save Changes" : "Create Item"}
+                <Save size={16} />
+                {isEditing ? "Save" : "Create Item"}
               </button>
             </div>
           </div>

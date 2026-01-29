@@ -412,9 +412,9 @@ const POS: React.FC<POSProps> = ({
   return (
     <div className="flex flex-col h-full bg-gray-50 rounded-t-[2.5rem] overflow-hidden">
       {/* Unified POS Header with Pill Categories Stacking */}
-      <div className="bg-transparent px-4 pt-0 pb-2 flex flex-col gap-2 flex-shrink-0">
+      <div className="bg-transparent pl-2 pr-4 pt-0 pb-2 flex flex-col gap-2 flex-shrink-0">
         {/* Terminal Header */}
-        <div className="flex items-center justify-between py-3 px-6 bg-white/70 backdrop-blur-xl rounded-full shadow-[0_15px_35px_-5px_rgba(249,115,22,0.12),0_5px_15px_-3px_rgba(0,0,0,0.04)] relative border border-white/40 group overflow-hidden">
+        <div className="flex items-center justify-between py-3 pl-3 pr-6 bg-white/70 backdrop-blur-xl rounded-full shadow-[0_15px_35px_-5px_rgba(249,115,22,0.12),0_5px_15px_-3px_rgba(0,0,0,0.04)] relative border border-white/40 group overflow-hidden">
           {/* Subtle Inner Glow */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
@@ -506,7 +506,7 @@ const POS: React.FC<POSProps> = ({
 
       <div className="flex flex-1 overflow-hidden relative">
         {/* POS Product Grid */}
-        <div className="flex-1 overflow-y-auto px-4 lg:px-4 pb-24 lg:pb-6 no-scrollbar">
+        <div className="flex-1 overflow-y-auto pl-2 pr-4 lg:pl-2 lg:pr-4 pb-24 lg:pb-6 no-scrollbar">
           {filteredProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 px-4 w-full h-[60vh]">
               <div className="relative mb-8">
@@ -665,7 +665,7 @@ const POS: React.FC<POSProps> = ({
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] lg:text-[15px] font-medium text-gray-800 truncate leading-tight">
+                    <p className="text-[13px] lg:text-[15px] font-normal text-gray-800 truncate leading-tight">
                       {item.name}
                     </p>
                     <p className="text-[12px] lg:text-[13px] font-bold text-orange-600">
@@ -776,67 +776,66 @@ const POS: React.FC<POSProps> = ({
       {showCheckoutConfirm && (
         <div className="fixed inset-0 z-[500] flex items-end md:items-center justify-center p-0 md:p-4">
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-md"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm"
             onClick={cancelCheckout}
           />
-          <div className="bg-white rounded-t-[2.5rem] md:rounded-2xl w-full max-w-md shadow-2xl overflow-hidden relative z-[510] animate-in slide-in-from-bottom md:zoom-in duration-300">
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                  <AlertCircle className="text-yellow-600" size={24} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-800 text-lg">
-                    Confirm Checkout
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    Review your order before proceeding
-                  </p>
-                </div>
+          <div className="bg-white rounded-t-3xl md:rounded-2xl w-full max-w-sm shadow-xl overflow-hidden relative z-[510] animate-in slide-in-from-bottom md:zoom-in duration-200">
+            <div className="p-4">
+              {/* Minimal Header */}
+              <div className="mb-3">
+                <h3 className="text-lg font-bold text-gray-900 tracking-tight">
+                  Checkout Confirmation
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Confirm the order details before processing.
+                </p>
               </div>
 
-              <div className="bg-gray-50 rounded-xl p-4 mb-4 max-h-64 overflow-y-auto">
-                <div className="space-y-2">
+              {/* Clean Order List */}
+              <div className="border-t border-b border-gray-100 py-2.5 mb-3">
+                <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1">
                   {cart.map((item) => (
                     <div
                       key={item.id}
                       className="flex items-center justify-between text-sm"
                     >
-                      <div className="flex-1">
-                        <span className="font-medium text-gray-800">
+                      <div className="flex-1 min-w-0 pr-4">
+                        <span className="font-medium text-gray-700 block truncate leading-tight">
                           {item.name}
                         </span>
-                        <span className="text-gray-500 ml-2">
-                          x {item.quantity}
+                        <span className="text-[10px] text-gray-400 mt-0 block font-medium">
+                          Qty: {item.quantity}
                         </span>
                       </div>
-                      <span className="font-bold text-gray-800">
+                      <span className="font-bold text-gray-900 text-xs whitespace-nowrap">
                         {CURRENCY}&nbsp;
                         {formatCurrency(item.price * item.quantity)}
                       </span>
                     </div>
                   ))}
                 </div>
-                <div className="border-t border-gray-200 mt-3 pt-3 flex justify-between items-center">
-                  <span className="font-bold text-gray-800">Total:</span>
-                  <span className="text-xl font-bold text-green-600">
+
+                <div className="mt-2.5 pt-2.5 border-t border-gray-100 flex justify-between items-center">
+                  <span className="text-sm font-bold text-gray-700">Total</span>
+                  <span className="text-lg font-black text-orange-600">
                     {CURRENCY}&nbsp;{formatCurrency(cartTotal)}
                   </span>
                 </div>
               </div>
 
-              {/* Payment Input Section */}
-              <div className="mb-4 space-y-3">
+              {/* Minimalist Payment Input */}
+              <div className="space-y-2.5 mb-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2">
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 ml-0.5">
                     Amount Received
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">
                       {CURRENCY}
                     </span>
                     <input
                       type="number"
+                      autoFocus
                       value={
                         isPaymentFocused && customerPayment === "0"
                           ? ""
@@ -847,12 +846,7 @@ const POS: React.FC<POSProps> = ({
                           e.target.value === "" ? "0" : e.target.value;
                         setCustomerPayment(val);
                       }}
-                      onFocus={() => {
-                        setIsPaymentFocused(true);
-                        if (customerPayment === "0") {
-                          setCustomerPayment("");
-                        }
-                      }}
+                      onFocus={() => setIsPaymentFocused(true)}
                       onBlur={(e) => {
                         setIsPaymentFocused(false);
                         if (
@@ -863,61 +857,52 @@ const POS: React.FC<POSProps> = ({
                         }
                       }}
                       placeholder="0.00"
-                      min="0"
-                      step="0.01"
-                      className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-gray-100 focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-400 focus:bg-white bg-gray-50 text-gray-900 text-sm transition-all duration-300 shadow-sm"
+                      className="w-full pl-8 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-gray-900 font-bold text-base bg-gray-50/50"
                     />
                   </div>
                 </div>
 
                 {customerPayment && parseFloat(customerPayment) > 0 && (
-                  <div className="bg-gray-50 rounded-lg p-3 space-y-2">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600">Total Amount:</span>
-                      <span className="font-bold text-gray-800">
-                        {CURRENCY}&nbsp;{formatCurrency(cartTotal)}
+                  <div className="bg-gray-50/80 rounded-xl p-3 space-y-1 text-xs ring-1 ring-gray-100">
+                    <div className="flex justify-between items-center text-gray-500">
+                      <span>Amount Due</span>
+                      <span className="font-semibold">
+                        {CURRENCY} {formatCurrency(cartTotal)}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600">Payment:</span>
-                      <span className="font-bold text-gray-800">
-                        {CURRENCY}&nbsp;
-                        {formatCurrency(parseFloat(customerPayment || "0"))}
-                      </span>
-                    </div>
-                    <div className="border-t border-gray-200 pt-2 flex justify-between items-center">
-                      <span className="font-bold text-gray-800">Change:</span>
+                    <div className="flex justify-between items-center pt-1.5 border-t border-gray-200/60 mt-1.5">
+                      <span className="font-bold text-gray-600">Change</span>
                       <span
-                        className={`text-lg font-bold ${
-                          change >= 0 ? "text-green-600" : "text-red-600"
+                        className={`text-base font-black ${
+                          change >= 0 ? "text-green-600" : "text-red-500"
                         }`}
                       >
-                        {CURRENCY}&nbsp;{formatCurrency(change)}
+                        {CURRENCY} {formatCurrency(change)}
                       </span>
                     </div>
                     {!isPaymentValid && (
-                      <p className="text-xs text-red-500 mt-1">
-                        ⚠️ Insufficient payment. Please enter amount equal to or
-                        greater than total.
+                      <p className="text-[10px] text-red-500 font-bold mt-1 uppercase tracking-tight">
+                        Insufficient payment.
                       </p>
                     )}
                   </div>
                 )}
               </div>
 
+              {/* Functional Actions */}
               <div className="flex gap-2">
                 <button
                   onClick={cancelCheckout}
-                  className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                  className="flex-1 px-4 py-2 text-gray-500 font-bold text-sm hover:bg-gray-100 rounded-xl transition-all active:scale-95"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmCheckout}
                   disabled={!isPaymentValid || cart.length === 0}
-                  className="flex-1 px-3 py-2 bg-[#34A853] text-white rounded-lg text-sm font-medium hover:bg-[#2d9147] transition-colors flex items-center justify-center gap-1.5 disabled:bg-gray-200 disabled:cursor-not-allowed shadow-md"
+                  className="flex-[1.5] px-4 py-2 bg-orange-500 text-white rounded-xl font-bold text-sm hover:bg-orange-600 transition-all disabled:bg-indigo-100 disabled:text-indigo-300 disabled:cursor-not-allowed shadow-md shadow-orange-100 active:scale-[0.98]"
                 >
-                  <CreditCard size={14} /> Confirm Checkout
+                  Checkout
                 </button>
               </div>
             </div>

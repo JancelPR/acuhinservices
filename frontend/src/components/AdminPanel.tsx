@@ -224,7 +224,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       <main
         className={`flex-1 transition-all duration-[2000ms] ${
           isSidebarCollapsed ? "md:ml-20" : "md:ml-48 lg:ml-64"
-        } px-2 md:px-4 pt-2 md:pt-3 pb-0 overflow-hidden h-screen flex flex-col relative`}
+        } pl-1 pr-2 md:pl-2 md:pr-4 pt-2 md:pt-3 pb-0 overflow-hidden h-screen flex flex-col relative`}
       >
         <div className="flex-1 overflow-hidden flex flex-col">
           <Routes>
