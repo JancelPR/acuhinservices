@@ -173,6 +173,7 @@ const POS: React.FC<POSProps> = ({
   const [showCheckoutConfirm, setShowCheckoutConfirm] = useState(false);
   const [customerPayment, setCustomerPayment] = useState("");
   const [isPaymentFocused, setIsPaymentFocused] = useState(false);
+  const [isCheckoutProcessing, setIsCheckoutProcessing] = useState(false);
   const [isCartVisible, setIsCartVisible] = useState(false); // Mobile cart visibility (Bottom Sheet)
 
   // Custom Item State
@@ -310,9 +311,10 @@ const POS: React.FC<POSProps> = ({
   };
 
   const confirmCheckout = async () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || isCheckoutProcessing) return;
 
     try {
+      setIsCheckoutProcessing(true);
       const transactionId = Math.random()
         .toString(36)
         .substr(2, 9)
@@ -375,6 +377,8 @@ const POS: React.FC<POSProps> = ({
           ? error.message
           : "Failed to process checkout. Please try again.",
       );
+    } finally {
+      setIsCheckoutProcessing(false);
     }
   };
 
@@ -899,10 +903,19 @@ const POS: React.FC<POSProps> = ({
                 </button>
                 <button
                   onClick={confirmCheckout}
-                  disabled={!isPaymentValid || cart.length === 0}
-                  className="flex-[1.5] px-4 py-2 bg-orange-500 text-white rounded-xl font-bold text-sm hover:bg-orange-600 transition-all disabled:bg-indigo-100 disabled:text-indigo-300 disabled:cursor-not-allowed shadow-md shadow-orange-100 active:scale-[0.98]"
+                  disabled={
+                    !isPaymentValid || cart.length === 0 || isCheckoutProcessing
+                  }
+                  className="flex-[1.5] px-4 py-2 bg-orange-500 text-white rounded-xl font-bold text-sm hover:bg-orange-600 transition-all disabled:bg-indigo-100 disabled:text-indigo-300 disabled:cursor-not-allowed shadow-md shadow-orange-100 active:scale-[0.98] flex items-center justify-center gap-2"
                 >
-                  Checkout
+                  {isCheckoutProcessing ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    "Checkout"
+                  )}
                 </button>
               </div>
             </div>
