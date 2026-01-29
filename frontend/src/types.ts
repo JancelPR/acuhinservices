@@ -25,6 +25,8 @@ export interface ReceiptData {
   total: number;
   date: string;
   id: string;
+  receiptNumber?: string;
+  action?: string;
   payment?: number;
   change?: number;
 }

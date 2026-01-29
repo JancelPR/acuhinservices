@@ -15,10 +15,29 @@ const transactionSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  receiptNumber: {
+    type: String,
+    unique: true,
+    sparse: true // Allows nulls/missing for old records while enforcing uniqueness on new ones
+  },
+  action: {
+    type: String,
+    default: 'CREATE_TRANSACTION'
+  },
   items: [cartItemSchema],
   total: {
     type: Number,
     required: true
+  },
+  payment: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  change: {
+    type: Number,
+    required: true,
+    default: 0
   },
   date: {
     type: Date,

@@ -1,4 +1,5 @@
 import Transaction from '../models/Transaction.js';
+import Counter from '../models/Counter.js';
 import { mapMongoErrorToHttp } from '../config/db.js';
 
 /**
@@ -30,7 +31,7 @@ export const getTransactions = async (req, res) => {
  */
 export const createTransaction = async (req, res) => {
   try {
-    const { items, total, id } = req.body;
+    const { items, total, id, payment, change } = req.body;
     
     if (!id) return res.status(400).json({ message: 'Transaction ID is required' });
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -40,6 +41,23 @@ export const createTransaction = async (req, res) => {
       return res.status(400).json({ message: 'Total amount is required and must be a number' });
     }
     
+    // 1. Generate Receipt Number: RCPT-YYMMDD-###
+    const now = new Date();
+    const yy = String(now.getFullYear()).slice(-2);
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const dateStr = `${yy}${mm}${dd}`;  // YYMMDD
+    
+    // Atomically increment counter for this day
+    const counter = await Counter.findOneAndUpdate(
+      { date: dateStr },
+      { $inc: { seq: 1 } },
+      { upsert: true, new: true }
+    );
+    
+    const seqStr = String(counter.seq).padStart(3, '0');
+    const receiptNumber = `RCPT-${dateStr}-${seqStr}`;
+
     // Sanitize and validate items
     const sanitizedItems = items.map((item, index) => {
       if (!item.id || !item.name || item.price === undefined || item.quantity === undefined) {
@@ -57,8 +75,12 @@ export const createTransaction = async (req, res) => {
     
     const newTransaction = new Transaction({
       transactionId: String(id),
+      receiptNumber: receiptNumber,
+      action: 'CREATE_TRANSACTION',
       items: sanitizedItems,
       total: Number(total),
+      payment: Number(payment || 0),
+      change: Number(change || 0),
       date: new Date(),
     });
     

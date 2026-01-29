@@ -2,6 +2,7 @@ import React from "react";
 import { ReceiptData } from "../types";
 import { CURRENCY, STORE_NAME } from "../constants";
 import { X, Printer } from "lucide-react";
+import Barcode from "react-barcode";
 
 interface ReceiptModalProps {
   receipt: ReceiptData | null;
@@ -14,6 +15,10 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
   const handlePrint = () => {
     window.print();
   };
+
+  // Use receiptNumber if available, otherwise fallback to id
+  const displayReceiptNumber =
+    receipt.receiptNumber || receipt.id.slice(-5).toUpperCase();
 
   return (
     <div
@@ -41,12 +46,10 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
         {/* Receipt Content - Printable Area */}
         <div
           className="p-4 overflow-y-auto flex-1 bg-white print:p-0 print:m-0"
-          style={{ fontFamily: "'DotGothic16', monospace" }}
+          style={{ fontFamily: "'Courier New', Courier, monospace" }}
           id="printable-receipt"
         >
           <style>{`
-            @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
-
             @media print {
               @page {
                 size: 58mm auto;
@@ -57,17 +60,17 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
                 margin: 0 !important;
                 padding: 0 !important;
                 background: white;
-                font-family: 'DotGothic16', monospace !important;
+                font-family: 'Courier New', Courier, monospace !important;
                 visibility: hidden;
               }
               #printable-receipt {
                 visibility: visible !important;
                 position: absolute;
-                left: 2mm;
+                left: 0;
                 top: 0;
-                width: 52mm !important;
+                width: 54mm !important;
                 margin: 0;
-                padding: 1mm !important;
+                padding: 2mm !important;
                 background: white;
                 display: block !important;
               }
@@ -105,8 +108,8 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
 
           <div className="text-[10px] space-y-0.5">
             <div className="flex justify-start">
-              <span className="font-bold">INV#:</span>
-              <span className="ml-1">{receipt.id.slice(-5).toUpperCase()}</span>
+              <span className="font-bold">Receipt No:</span>
+              <span className="ml-1">{displayReceiptNumber}</span>
             </div>
             <div className="flex justify-between">
               <div>
@@ -130,16 +133,6 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
                 </span>
               </div>
             </div>
-          </div>
-
-          <div className="dashed-line"></div>
-
-          <div className="text-[10px] text-center font-bold">
-            CUSTOMER INFORMATION
-          </div>
-          <div className="text-[10px] flex">
-            <span className="font-bold">NAME:</span>
-            <span className="ml-8 uppercase">Customer</span>
           </div>
 
           <div className="dashed-line"></div>
@@ -217,7 +210,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
                 }) || "0.00"}
               </span>
             </div>
-            <div className="text-[10px]">Cash</div>
+
             <div className="flex justify-between">
               <span className="font-bold">CHANGE AMOUNT:</span>
               <span className="tabular-nums">
@@ -234,6 +227,23 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
           <div className="text-center space-y-2 mt-2">
             <div className="text-[11px] font-bold">GOD BLESS</div>
             <div className="dashed-line"></div>
+
+            {/* Barcode Section */}
+            <div className="flex flex-col items-center justify-center py-1 overflow-hidden w-full">
+              <div className="transform scale-x-90 origin-center">
+                <Barcode
+                  value={displayReceiptNumber}
+                  format="CODE128"
+                  width={1}
+                  height={30}
+                  fontSize={10}
+                  font="'Courier New', Courier, monospace"
+                  background="transparent"
+                  margin={0}
+                />
+              </div>
+            </div>
+
             <div className="text-[10px]">Acknowledgement Receipt</div>
             <div className="text-[11px] font-bold">Thank you!</div>
           </div>

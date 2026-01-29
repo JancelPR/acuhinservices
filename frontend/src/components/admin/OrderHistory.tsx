@@ -45,7 +45,11 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({
           !transactionSearchQuery ||
           transaction.id
             .toLowerCase()
-            .includes(transactionSearchQuery.toLowerCase());
+            .includes(transactionSearchQuery.toLowerCase()) ||
+          (transaction.receiptNumber &&
+            transaction.receiptNumber
+              .toLowerCase()
+              .includes(transactionSearchQuery.toLowerCase()));
 
         if (!matchesTransactionId) return false;
 
@@ -132,6 +136,58 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({
     }
   }, [openDownloadMenu]);
 
+  // Barcode Scanning Logic
+  useEffect(() => {
+    let buffer = "";
+    let lastKeyTime = Date.now();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const currentTime = Date.now();
+
+      // If time between keys is > 50ms, it's likely manual typing
+      if (currentTime - lastKeyTime > 50) {
+        buffer = "";
+      }
+
+      if (e.key === "Enter") {
+        if (buffer.length > 5) {
+          // Minimum length for a barcode
+          setTransactionSearchQuery(buffer);
+          // Highlight/scroll logic will be handled by the effect of searchQuery changing
+          buffer = "";
+        }
+      } else if (e.key.length === 1) {
+        buffer += e.key;
+      }
+
+      lastKeyTime = currentTime;
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // Auto-scroll/highlight on search match
+  useEffect(() => {
+    if (transactionSearchQuery && filteredTransactions.length > 0) {
+      const match = filteredTransactions.find(
+        (t) =>
+          t.receiptNumber?.toLowerCase() ===
+            transactionSearchQuery.toLowerCase() ||
+          t.id.toLowerCase() === transactionSearchQuery.toLowerCase(),
+      );
+
+      if (match) {
+        const element = document.getElementById(`row-${match.id}`);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+          element.classList.add("bg-orange-50");
+          setTimeout(() => element.classList.remove("bg-orange-50"), 2000);
+        }
+      }
+    }
+  }, [transactionSearchQuery, filteredTransactions]);
+
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
       {/* Terminal Style Header for Logs */}
@@ -160,7 +216,7 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({
             />
             <input
               type="text"
-              placeholder="Search transaction ID..."
+              placeholder="Search Receipt No or ID..."
               value={transactionSearchQuery}
               onChange={(e) => setTransactionSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-1.5 bg-orange-50/10 border border-orange-100/30 rounded-full text-sm text-gray-700 placeholder:text-gray-400/80 outline-none focus:ring-4 focus:ring-orange-500/5 focus:bg-white focus:border-orange-200 transition-all duration-300 shadow-inner"
@@ -347,10 +403,16 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({
                 <thead className="border-b border-gray-100">
                   <tr>
                     <th className="sticky top-0 z-10 bg-gray-50 px-3 md:px-4 py-3 md:py-4 text-left text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      TRANS. ID
+                      RECEIPT NO
+                    </th>
+                    <th className="sticky top-0 z-10 bg-gray-50 px-3 md:px-4 py-3 md:py-4 text-left text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      INV#
                     </th>
                     <th className="sticky top-0 z-10 bg-gray-50 px-3 md:px-4 py-3 md:py-4 text-left text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider">
                       Date
+                    </th>
+                    <th className="sticky top-0 z-10 bg-gray-50 px-3 md:px-4 py-3 md:py-4 text-left text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      Action
                     </th>
                     <th className="sticky top-0 z-10 bg-gray-50 px-3 md:px-4 py-3 md:py-4 text-center text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider">
                       Items
@@ -371,8 +433,12 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({
                   {filteredTransactions.map((t) => (
                     <tr
                       key={t.id}
+                      id={`row-${t.id}`}
                       className="hover:bg-gray-50 transition-colors group"
                     >
+                      <td className="px-3 md:px-4 py-3 md:py-4 text-[11px] md:text-sm font-bold text-orange-600 whitespace-nowrap">
+                        {t.receiptNumber || "-"}
+                      </td>
                       <td className="px-3 md:px-4 py-3 md:py-4 text-[11px] md:text-sm text-gray-900 whitespace-nowrap">
                         #{t.id}
                       </td>
@@ -403,6 +469,12 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({
                             return t.date;
                           }
                         })()}
+                      </td>
+
+                      <td className="px-4 py-4 text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">
+                        <span className="px-2 py-1 bg-gray-100 rounded-md">
+                          {t.action || "CREATE_TRANSACTION"}
+                        </span>
                       </td>
 
                       <td className="px-4 py-4 text-sm text-gray-800 text-center whitespace-nowrap">
