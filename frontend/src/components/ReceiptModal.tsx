@@ -41,12 +41,12 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
         {/* Receipt Content - Printable Area */}
         <div
           className="p-4 overflow-y-auto flex-1 bg-white print:p-0 print:m-0"
-          style={{ fontFamily: "'Poppins', sans-serif" }}
+          style={{ fontFamily: "'DotGothic16', monospace" }}
           id="printable-receipt"
         >
           <style>{`
-            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap');
-            
+            @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+
             @media print {
               @page {
                 size: 58mm auto;
@@ -57,112 +57,185 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
                 margin: 0 !important;
                 padding: 0 !important;
                 background: white;
-                font-family: 'Poppins', sans-serif !important;
-              }
-              /* Hide everything by default */
-              body > * {
-                display: none !important;
-              }
-              /* Only show the receipt and its parents */
-              #printable-receipt, #printable-receipt * {
-                display: block !important;
-                visibility: visible !important;
-                color: black !important;
-                font-family: 'Poppins', sans-serif !important;
-                line-height: 1.3 !important;
+                font-family: 'DotGothic16', monospace !important;
+                visibility: hidden;
               }
               #printable-receipt {
+                visibility: visible !important;
                 position: absolute;
-                left: 0;
+                left: 2mm;
                 top: 0;
-                width: 56mm !important; /* Maximized printable area for 58mm rolls */
+                width: 52mm !important;
                 margin: 0;
                 padding: 1mm !important;
                 background: white;
-                box-shadow: none !important;
+                display: block !important;
               }
+              #printable-receipt * {
+                visibility: visible !important;
+              }
+              /* Preserve layout types like flex */
+              .flex { display: flex !important; }
+              .justify-between { justify-content: space-between !important; }
+              .flex-col { flex-direction: column !important; }
+            }
+            .dashed-line {
+              border-top: 1px dashed #000;
+              margin: 4px 0;
+              width: 100%;
+            }
+            .double-line {
+              border-top: 1px double #000;
+              margin: 4px 0;
+              width: 100%;
+              border-top-width: 3px;
+              border-top-style: double;
             }
           `}</style>
-          <div className="text-center mb-3">
-            <h1 className="text-sm font-bold uppercase tracking-tight text-gray-900 leading-tight">
-              {STORE_NAME}
-            </h1>
-            <p className="text-[10px] text-gray-600 font-medium">
-              NEIGHBORHOOD CONVENIENCE STORE
+
+          <div className="text-center font-bold">
+            <h1 className="text-[13px] uppercase">ACUHIN Grocery Store</h1>
+            <p className="text-[10px] uppercase">
+              VALLADOLID, NEGROS OCCIDENTAL
             </p>
-            <p className="text-[9px] text-gray-500">
-              Prk. Dos, Brgy Palaka, Valladolid
-            </p>
+            <p className="text-[10px]">09388067757</p>
           </div>
 
-          <div className="border-t border-dashed border-gray-400 py-1 flex justify-between text-[9px] text-gray-600 font-medium">
-            <div className="flex flex-col">
-              <span>{receipt.date.split(",")[0]}</span>
-              <span>{receipt.date.split(",")[1]?.trim()}</span>
+          <div className="dashed-line"></div>
+
+          <div className="text-[10px] space-y-0.5">
+            <div className="flex justify-start">
+              <span className="font-bold">INV#:</span>
+              <span className="ml-1">{receipt.id.slice(-5).toUpperCase()}</span>
             </div>
-            <div className="text-right flex flex-col">
-              <span>Receipt #</span>
-              <span>{receipt.id.slice(-6).toUpperCase()}</span>
+            <div className="flex justify-between">
+              <div>
+                <span className="font-bold">DATE:</span>
+                <span className="ml-1">
+                  {new Date(receipt.date).toLocaleDateString("en-US", {
+                    month: "2-digit",
+                    day: "2-digit",
+                    year: "numeric",
+                  })}
+                </span>
+              </div>
+              <div>
+                <span className="font-bold">TIME:</span>
+                <span className="ml-1">
+                  {new Date(receipt.date).toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })}
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="border-t border-dashed border-gray-400 pt-2 pb-1.5 space-y-1">
+          <div className="dashed-line"></div>
+
+          <div className="text-[10px] text-center font-bold">
+            CUSTOMER INFORMATION
+          </div>
+          <div className="text-[10px] flex">
+            <span className="font-bold">NAME:</span>
+            <span className="ml-8 uppercase">Customer</span>
+          </div>
+
+          <div className="dashed-line"></div>
+
+          <div className="space-y-2 mt-1">
             {receipt.items.map((item, idx) => (
-              <div
-                key={idx}
-                className="flex justify-between items-start text-[10px] text-gray-900"
-              >
-                <span className="flex-1 pr-2 leading-tight">
-                  {item.name}
-                  {item.quantity > 1 && (
-                    <span className="text-[8px] text-gray-500 ml-1 italic font-normal">
-                      x{item.quantity}
+              <div key={idx} className="text-[11px]">
+                <div className="uppercase">{item.name}</div>
+                <div className="flex justify-between pl-2">
+                  <div className="flex items-center gap-4">
+                    <span>{item.quantity.toFixed(1)}</span>
+                    <span>x</span>
+                    <span>
+                      {item.price.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </span>
-                  )}
-                </span>
-                <span className="font-bold tabular-nums whitespace-nowrap">
-                  {(item.price * item.quantity).toFixed(2)}
-                </span>
+                  </div>
+                  <span className="font-bold">
+                    {(item.price * item.quantity).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="border-t border-dashed border-gray-400 pt-2 space-y-1">
-            <div className="flex justify-between items-center text-[11px] font-bold text-gray-900">
-              <span>TOTAL:</span>
-              <span>
-                {CURRENCY}
-                {receipt.total.toFixed(2)}
+          <div className="dashed-line mt-2"></div>
+
+          <div className="text-[11px] flex justify-between">
+            <span className="font-bold tabular-nums">
+              {receipt.items
+                .reduce((sum, item) => sum + item.quantity, 0)
+                .toFixed(1)}
+            </span>
+            <span className="font-bold">Item(s)</span>
+          </div>
+
+          <div className="double-line"></div>
+
+          <div className="space-y-1">
+            <div className="flex justify-between text-[11px]">
+              <span className="font-bold">SUBTOTAL</span>
+              <span className="tabular-nums">
+                {receipt.total.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </span>
             </div>
 
-            {receipt.payment !== undefined && receipt.payment > 0 && (
-              <div className="pt-1.5 space-y-0.5">
-                <div className="flex justify-between items-center text-[10px] text-gray-600">
-                  <span>CASH:</span>
-                  <span className="tabular-nums">
-                    {receipt.payment.toFixed(2)}
-                  </span>
-                </div>
-                {receipt.change !== undefined && receipt.change >= 0 && (
-                  <div className="flex justify-between items-center text-[10px] text-gray-600">
-                    <span>CHANGE:</span>
-                    <span className="tabular-nums font-bold">
-                      {receipt.change.toFixed(2)}
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
+            <div className="flex justify-between text-[14px] font-black items-baseline mt-1">
+              <span>TOTAL</span>
+              <span className="tracking-tight">
+                {receipt.total.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
+            </div>
           </div>
 
-          <div className="border-t border-dashed border-gray-400 mt-3 pt-3 text-center">
-            <p className="text-[10px] text-gray-900 font-medium">
-              Thank you for shopping with us!
-            </p>
-            <div className="mt-2 text-gray-400 text-[8px] tracking-[0.2em]">
-              ------- *** -------
+          <div className="dashed-line mt-2"></div>
+
+          <div className="space-y-0.5 text-[11px]">
+            <div className="flex justify-between">
+              <span className="font-bold">PAYMENT RECEIVED:</span>
+              <span className="tabular-nums">
+                {receipt.payment?.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }) || "0.00"}
+              </span>
             </div>
+            <div className="text-[10px]">Cash</div>
+            <div className="flex justify-between">
+              <span className="font-bold">CHANGE AMOUNT:</span>
+              <span className="tabular-nums">
+                {receipt.change?.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }) || "0.00"}
+              </span>
+            </div>
+          </div>
+
+          <div className="dashed-line mt-3"></div>
+
+          <div className="text-center space-y-2 mt-2">
+            <div className="text-[11px] font-bold">GOD BLESS</div>
+            <div className="dashed-line"></div>
+            <div className="text-[10px]">Acknowledgement Receipt</div>
+            <div className="text-[11px] font-bold">Thank you!</div>
           </div>
         </div>
 
