@@ -22,7 +22,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
     >
       <div
         className="bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] print:max-h-none print:shadow-none print:rounded-none"
-        style={{ width: "72mm", maxWidth: "72mm" }}
+        style={{ width: "58mm", maxWidth: "58mm" }}
       >
         {/* Header - Hidden on print */}
         <div className="p-2 border-b border-gray-100 flex justify-between items-center bg-gray-50 print:hidden">
@@ -46,7 +46,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
           <style>{`
             @media print {
               @page {
-                size: 80mm auto;
+                size: 58mm auto;
                 margin: 0mm;
               }
               body * {
@@ -60,9 +60,9 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
                 position: absolute;
                 left: 0;
                 top: 0;
-                width: 72mm !important;
+                width: 48mm !important; /* Industry standard printable area for 58mm rolls */
                 margin: 0;
-                padding: 4mm !important;
+                padding: 2mm !important;
                 background: white;
                 box-shadow: none !important;
               }
@@ -95,7 +95,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
               <tbody className="text-gray-800">
                 {receipt.items.map((item, idx) => (
                   <tr key={idx}>
-                    <td className="py-0.5 pr-1 max-w-[50px] truncate text-[8px]">
+                    <td className="py-0.5 pr-0.5 max-w-[40px] truncate text-[8px]">
                       {item.name}
                       {item.unit && (
                         <span className="text-[7px] text-gray-400 ml-0.5">
