@@ -17,6 +17,9 @@ import {
   Monitor,
   PlusCircle,
   PackageSearch,
+  LayoutGrid,
+  List,
+  Store,
 } from "lucide-react";
 import { useScrollReveal } from "../../hooks/useScrollReveal";
 import ProductCard from "../ProductCard";
@@ -151,7 +154,9 @@ const POS: React.FC<POSProps> = ({
   const [showCheckoutConfirm, setShowCheckoutConfirm] = useState(false);
   const [customerPayment, setCustomerPayment] = useState("");
   const [isPaymentFocused, setIsPaymentFocused] = useState(false);
+  const [isCheckoutProcessing, setIsCheckoutProcessing] = useState(false);
   const [isCartVisible, setIsCartVisible] = useState(false); // Mobile cart visibility (Bottom Sheet)
+  const [viewMode, setViewMode] = useState<"card" | "list">("card"); // "card" or "list" view mode
 
   // Custom Item State
   const [showCustomItemModal, setShowCustomItemModal] = useState(false);
@@ -268,9 +273,10 @@ const POS: React.FC<POSProps> = ({
   };
 
   const confirmCheckout = async () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || isCheckoutProcessing) return;
 
     try {
+      setIsCheckoutProcessing(true);
       const transactionId = Math.random()
         .toString(36)
         .substr(2, 9)
@@ -332,6 +338,8 @@ const POS: React.FC<POSProps> = ({
           ? error.message
           : "Failed to process checkout. Please try again.",
       );
+    } finally {
+      setIsCheckoutProcessing(false);
     }
   };
 
@@ -386,21 +394,48 @@ const POS: React.FC<POSProps> = ({
             </span>
           </h1>
 
-          {/* Integrated Search Bar */}
-          <div className="relative flex-1 max-w-sm ml-auto z-20 group/search">
-            <Search
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-orange-400/70 group-focus-within/search:text-orange-500 transition-colors"
-              size={16}
-            />
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-1.5 bg-orange-50/30 border border-orange-100/50 rounded-full text-sm text-gray-700 placeholder:text-gray-400/80 outline-none focus:ring-4 focus:ring-orange-500/5 focus:bg-white focus:border-orange-200 transition-all duration-300 shadow-inner"
-            />
-          </div>
+          {/* View Mode Toggle & Integrated Search Bar */}
+          <div className="flex items-center gap-2 flex-1 max-w-sm ml-auto z-20">
+            {/* Explorer-style View Mode Toggle */}
+            <div className="flex items-center bg-orange-50/50 p-1 rounded-full border border-orange-100/30 shadow-inner">
+              <button
+                onClick={() => setViewMode("card")}
+                className={`p-1.5 rounded-full transition-all duration-300 ${
+                  viewMode === "card"
+                    ? "bg-white text-orange-600 shadow-sm"
+                    : "text-gray-400 hover:text-orange-400"
+                }`}
+                title="Card View"
+              >
+                <LayoutGrid size={14} />
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`p-1.5 rounded-full transition-all duration-300 ${
+                  viewMode === "list"
+                    ? "bg-white text-orange-600 shadow-sm"
+                    : "text-gray-400 hover:text-orange-400"
+                }`}
+                title="List View"
+              >
+                <List size={14} />
+              </button>
+            </div>
 
+            <div className="relative flex-1 group/search">
+              <Search
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-orange-400/70 group-focus-within/search:text-orange-500 transition-colors"
+                size={16}
+              />
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-1.5 bg-orange-50/10 border border-orange-100/30 rounded-full text-sm text-gray-700 placeholder:text-gray-400/80 outline-none focus:ring-4 focus:ring-orange-500/5 focus:bg-white focus:border-orange-200 transition-all duration-300 shadow-inner"
+              />
+            </div>
+          </div>
           {/* Liquid highlight effect */}
           <div className="absolute -left-1/4 top-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-150%] group-hover:translate-x-[350%] transition-transform duration-[1500ms]" />
         </div>
@@ -493,16 +528,114 @@ const POS: React.FC<POSProps> = ({
             </div>
           ) : (
             <div
-              className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 ${isSidebarCollapsed ? "xl:grid-cols-5" : "xl:grid-cols-4"} 2xl:grid-cols-5 gap-3 md:gap-3`}
+              className={
+                viewMode === "card"
+                  ? `grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 ${
+                      isSidebarCollapsed ? "xl:grid-cols-5" : "xl:grid-cols-4"
+                    } 2xl:grid-cols-5 gap-2 md:gap-2 px-1`
+                  : `grid grid-cols-1 sm:grid-cols-2 gap-2 px-1`
+              }
             >
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  isAdmin={false}
-                  onAddToCart={addToCart}
-                />
-              ))}
+              {filteredProducts.map((product) => {
+                const cartItem = cart.find((item) => item.id === product.id);
+                const isAvailable = product.stock > 0;
+
+                if (viewMode === "list") {
+                  return (
+                    <div
+                      key={product.id}
+                      onClick={() => isAvailable && addToCart(product)}
+                      className={`flex items-center gap-2 bg-white/60 backdrop-blur-md border border-gray-100 p-1.5 rounded-xl hover:bg-white hover:shadow-md transition-all group relative cursor-pointer ${
+                        !isAvailable
+                          ? "opacity-60 grayscale cursor-not-allowed"
+                          : ""
+                      } ${!!cartItem ? "border-orange-200 bg-white shadow-sm" : ""}`}
+                    >
+                      {/* Small image on the left */}
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 relative group-hover:scale-95 transition-transform duration-500">
+                        {product.image && product.image !== "No Image" ? (
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-200">
+                            <Store size={24} />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Text on the right */}
+                      <div className="flex-1 flex flex-col min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="font-bold text-gray-800 text-[11px] md:text-xs line-clamp-1">
+                            {product.name}
+                          </h3>
+                          <div
+                            className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8px] font-bold ${
+                              isAvailable
+                                ? "bg-green-50 text-green-600"
+                                : "bg-red-50 text-red-600"
+                            }`}
+                          >
+                            <div
+                              className={`w-1 h-1 rounded-full ${isAvailable ? "bg-green-500" : "bg-red-500"}`}
+                            />
+                            {isAvailable ? "In Stock" : "Retail"}
+                          </div>
+                        </div>
+                        <div className="mt-0 flex items-center justify-between">
+                          <div className="text-orange-600 font-extrabold text-xs md:text-xs">
+                            <span className="text-[10px] mr-0.5">
+                              {CURRENCY}
+                            </span>
+                            {product.price.toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                            {product.unit && (
+                              <span className="text-[10px] text-gray-400 font-normal lowercase ml-1">
+                                / {product.unit}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Cart Quantity Badge and Plus Icon */}
+                          <div className="flex items-center gap-2">
+                            {cartItem && (
+                              <span className="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-lg text-[10px] font-black">
+                                {cartItem.quantity}
+                              </span>
+                            )}
+                            <div
+                              className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${
+                                cartItem
+                                  ? "bg-orange-500 text-white"
+                                  : "bg-orange-50 text-orange-500 group-hover:bg-orange-500 group-hover:text-white"
+                              }`}
+                            >
+                              <Plus size={14} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    isAdmin={false}
+                    onAddToCart={addToCart}
+                    isInCart={!!cartItem}
+                    cartQuantity={cartItem?.quantity}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
@@ -818,10 +951,17 @@ const POS: React.FC<POSProps> = ({
                 </button>
                 <button
                   onClick={confirmCheckout}
-                  disabled={!isPaymentValid || cart.length === 0}
+                  disabled={
+                    !isPaymentValid || cart.length === 0 || isCheckoutProcessing
+                  }
                   className="flex-1 px-3 py-2 bg-[#34A853] text-white rounded-lg text-sm font-medium hover:bg-[#2d9147] transition-colors flex items-center justify-center gap-1.5 disabled:bg-gray-200 disabled:cursor-not-allowed shadow-md"
                 >
-                  <CreditCard size={14} /> Confirm Checkout
+                  {isCheckoutProcessing ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <CreditCard size={14} />
+                  )}
+                  {isCheckoutProcessing ? "Processing..." : "Confirm Checkout"}
                 </button>
               </div>
             </div>
