@@ -178,7 +178,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
 
           <div className="space-y-1">
             <div className="flex justify-between text-[11px]">
-              <span className="font-bold">SUBTOTAL</span>
+              <span className="font-medium">SUBTOTAL</span>
               <span className="tabular-nums">
                 {receipt.total.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
@@ -240,6 +240,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ receipt, onClose }) => {
                   font="'Courier New', Courier, monospace"
                   background="transparent"
                   margin={0}
+                  displayValue={false}
                 />
               </div>
             </div>
